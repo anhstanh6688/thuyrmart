@@ -395,6 +395,34 @@
           "Hệ thống đã tự động nhận diện giao dịch chuyển khoản thành công. Đơn hàng của bạn đang được chuẩn bị để giao đi ngay lập tức.";
         desc.style.color = "#166534";
         document.getElementById("btn-simulate-pay").style.display = "none";
+
+        // Update header UI to "Order successful"
+        document.querySelector(".success-title").textContent = "Đặt hàng thành công!";
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get("id");
+        document.querySelector(".success-subtitle").innerHTML = `Cảm ơn bạn đã tin tưởng Ocean ThuyR Mart. Mã đơn hàng của bạn là <strong id="order-id">#ORD-${orderId}</strong>.`;
+
+        const iconWrapper = document.querySelector(".check-icon-wrapper");
+        if (iconWrapper) {
+          iconWrapper.style.background = "#e6f9f0";
+          iconWrapper.style.color = "var(--tertiary)";
+          iconWrapper.innerHTML = `<i data-lucide="check-circle" style="width: 48px; height: 48px" stroke-width="2.5"></i>`;
+        }
+
+        if (window.lucide) lucide.createIcons();
+      }
+
+      function showPendingState(orderId) {
+        document.querySelector(".success-title").textContent = "Đang chờ thanh toán...";
+        document.querySelector(".success-subtitle").innerHTML = `Đơn hàng của bạn đã được ghi nhận. Vui lòng chuyển khoản để hoàn tất đặt hàng. Mã đơn hàng: <strong id="order-id">#ORD-${orderId}</strong>.`;
+
+        const iconWrapper = document.querySelector(".check-icon-wrapper");
+        if (iconWrapper) {
+          iconWrapper.style.background = "#fffbeb";
+          iconWrapper.style.color = "#d97706";
+          iconWrapper.innerHTML = `<i data-lucide="clock" style="width: 48px; height: 48px" stroke-width="2.5"></i>`;
+        }
+
         if (window.lucide) lucide.createIcons();
       }
 
@@ -490,9 +518,10 @@
                   if (simulateBtn) simulateBtn.style.display = "none";
                 }
 
-                if (order.paid_amount >= order.final_amount) {
+                 if (order.paid_amount >= order.final_amount) {
                   showPaidState();
                 } else {
+                  showPendingState(order.id);
                   // Start polling status every 3 seconds
                   window.paymentPollInterval = setInterval(async () => {
                     try {
