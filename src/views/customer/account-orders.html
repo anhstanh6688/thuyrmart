@@ -224,6 +224,11 @@
                 <div id="modal-payment-countdown" style="font-size: 12px; color: #b45309; font-weight: 500;">(Hết hạn sau 10:00)</div>
             </div>
 
+            <!-- Zero Payment / Direct Pay Container for Demo -->
+            <div id="zero-payment-container" style="display: none; margin-top: 16px;">
+                <button type="button" onclick="confirmZeroPayment()" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; background: #059669; border: none; color: white; cursor: pointer; font-size: 14px; transition: background 0.2s;">Xác nhận thanh toán ngay (Miễn phí 100%)</button>
+            </div>
+
             <!-- Test Simulation Button -->
             <div style="margin-top: 16px; text-align: center;">
                 <button type="button" onclick="simulatePaymentInModal()" style="font-size: 11px; color: #b45309; background: none; border: none; text-decoration: underline; cursor: pointer; opacity: 0.8;">[Giả lập chuyển khoản thành công để test]</button>
@@ -596,6 +601,11 @@
             document.getElementById('payment-qr-modal').style.display = 'none';
             if (paymentPollInterval) clearInterval(paymentPollInterval);
             if (modalCountdownInterval) clearInterval(modalCountdownInterval);
+            
+            // Reset elements style modified by discount
+            document.getElementById('qr-image').style.opacity = '1';
+            document.getElementById('modal-payment-status').style.display = 'flex';
+            document.getElementById('zero-payment-container').style.display = 'none';
         }
 
         async function simulatePaymentInModal() {
@@ -614,27 +624,78 @@
             }
         }
 
+        async function confirmZeroPayment() {
+            if (!currentPayingOrderId) return;
+            const btn = document.querySelector('#zero-payment-container button');
+            if (btn) btn.disabled = true;
+            
+            try {
+                // Call official payment API to mark the order paid & completed
+                const res = await fetch(`/api/sales/${currentPayingOrderId}/pay`, { method: 'PUT' });
+                const data = await res.json();
+                
+                if (res.ok && data.success) {
+                    alert('Thanh toán đơn hàng thành công!');
+                    closePaymentModal();
+                    window.location.reload();
+                } else {
+                    alert('Lỗi khi hoàn tất đơn hàng: ' + (data.error || 'Lỗi không xác định'));
+                }
+            } catch (err) {
+                console.error("Zero payment confirmation error", err);
+                alert("Lỗi kết nối máy chủ khi thanh toán đơn hàng.");
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
         function applyDiscount() {
             const code = document.getElementById('discount-code').value.trim().toUpperCase();
-            if (code) {
-                // Mockup discount logic: 10% off
-                const discount = currentPayingAmount * 0.1;
-                const newAmount = currentPayingAmount - discount;
+            if (!code) return;
+            
+            // Check for 100% discount codes
+            if (code === 'DEMO100' || code === 'FREE100' || code === 'THUYRMART100') {
+                // Apply 100% discount
                 document.getElementById('qr-amount').innerHTML = `
                     <span style="text-decoration: line-through; color: var(--on-surface-variant); font-size: 14px;">${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentPayingAmount)}</span>
-                    <br>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(newAmount)}
+                    <br>0 đ
                 `;
                 document.getElementById('discount-msg').style.display = 'block';
-                document.getElementById('discount-msg').textContent = `Đã áp dụng giảm giá 10% (${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(discount)})`;
+                document.getElementById('discount-msg').textContent = `Áp dụng thành công mã giảm giá 100%!`;
+                document.getElementById('discount-msg').style.color = '#059669';
                 
-                // Update QR with new amount
-                const accountNo = "8871414053";
-                const accountName = encodeURIComponent("NGUYEN VIET ANH");
-                const rawDescription = `ThuyRMart CK HD${currentPayingOrderId}`;
-                const description = encodeURIComponent(rawDescription);
-                const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-compact.png?amount=${newAmount}&addInfo=${description}&accountName=${accountName}`;
-                document.getElementById('qr-image').src = qrUrl;
+                // Hide/blur QR code and timer elements to avoid confusion since it is now free
+                document.getElementById('qr-image').style.opacity = '0.3';
+                document.getElementById('modal-payment-status').style.display = 'none';
+                
+                // Show Zero Payment button
+                document.getElementById('zero-payment-container').style.display = 'block';
+                
+                // Stop polling and stop countdown
+                if (paymentPollInterval) clearInterval(paymentPollInterval);
+                if (modalCountdownInterval) clearInterval(modalCountdownInterval);
+                
+                return;
             }
+            
+            // Normal code: mockup 10% off
+            const discount = currentPayingAmount * 0.1;
+            const newAmount = currentPayingAmount - discount;
+            document.getElementById('qr-amount').innerHTML = `
+                <span style="text-decoration: line-through; color: var(--on-surface-variant); font-size: 14px;">${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentPayingAmount)}</span>
+                <br>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(newAmount)}
+            `;
+            document.getElementById('discount-msg').style.display = 'block';
+            document.getElementById('discount-msg').textContent = `Đã áp dụng giảm giá 10% (${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(discount)})`;
+            document.getElementById('discount-msg').style.color = '#059669';
+            
+            // Update QR with new amount
+            const accountNo = "8871414053";
+            const accountName = encodeURIComponent("NGUYEN VIET ANH");
+            const rawDescription = `ThuyRMart CK HD${currentPayingOrderId}`;
+            const description = encodeURIComponent(rawDescription);
+            const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-compact.png?amount=${newAmount}&addInfo=${description}&accountName=${accountName}`;
+            document.getElementById('qr-image').src = qrUrl;
         }
 
         async function showOrderDetail(id) {
