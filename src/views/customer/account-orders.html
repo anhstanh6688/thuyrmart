@@ -28,6 +28,24 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        .discount-choice-btn {
+            outline: none;
+            transition: all 0.2s ease !important;
+        }
+        .discount-choice-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(5, 150, 105, 0.15);
+        }
+        .discount-choice-btn:active {
+            transform: translateY(0);
+        }
+        .zero-pay-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35) !important;
+        }
+        .zero-pay-btn:active {
+            transform: translateY(1px);
+        }
     </style>
     <!-- Header -->
     <header class="header">
@@ -235,13 +253,11 @@
             </div>
 
             <!-- Zero Payment / Direct Pay Container for Demo -->
-            <div id="zero-payment-container" style="display: none; margin-top: 16px;">
-                <button type="button" onclick="confirmZeroPayment()" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; background: #059669; border: none; color: white; cursor: pointer; font-size: 14px; transition: background 0.2s;">Thanh toán ngay</button>
-            </div>
-
-            <!-- Test Simulation Button -->
-            <div style="margin-top: 16px; text-align: center;">
-                <button type="button" onclick="simulatePaymentInModal()" style="font-size: 11px; color: #b45309; background: none; border: none; text-decoration: underline; cursor: pointer; opacity: 0.8;">[Giả lập chuyển khoản thành công để test]</button>
+            <div id="zero-payment-container" style="display: none; margin-top: 20px;">
+                <button type="button" onclick="confirmZeroPayment()" class="zero-pay-btn" style="width: 100%; padding: 14px 20px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #059669 0%, #10b981 100%); border: none; color: white; cursor: pointer; font-size: 15px; font-family: 'Inter', sans-serif; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25); transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; outline: none;">
+                    <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i>
+                    <span>Thanh toán ngay</span>
+                </button>
             </div>
         </div>
     </div>
@@ -430,7 +446,7 @@
                 if (isPending) { 
                     statusClass = 'pending'; 
                     statusText = 'Chờ xử lý'; 
-                    if (order.payment_method === 'transfer') {
+                    if (order.payment_method === 'transfer' && order.paid_amount < order.final_amount) {
                         const expireTime = new Date(order.order_date).getTime() + 10 * 60 * 1000;
                         statusTextHtml = `Chờ xử lý<br><span class="countdown-timer" data-time="${expireTime}" style="font-size: 11px; color: #d97706; font-weight: 500; display: block; margin-top: 2px;">Tính toán...</span>`;
                     } else {
@@ -637,21 +653,7 @@
             document.getElementById('zero-payment-container').style.display = 'none';
         }
 
-        async function simulatePaymentInModal() {
-            if (!currentPayingOrderId) return;
-            try {
-                const res = await fetch(`/api/sales/${currentPayingOrderId}/mock-pay`, { method: 'PUT' });
-                const data = await res.json();
-                if (data.success) {
-                    alert('Đã gửi yêu cầu giả lập thanh toán thành công!');
-                } else {
-                    alert('Lỗi giả lập: ' + data.error);
-                }
-            } catch (err) {
-                console.error("Simulation error", err);
-                alert("Lỗi kết nối máy chủ khi giả lập.");
-            }
-        }
+
 
         async function confirmZeroPayment() {
             if (!currentPayingOrderId) return;
@@ -740,6 +742,7 @@
             
             // Show Zero Payment button
             document.getElementById('zero-payment-container').style.display = 'block';
+            if (window.lucide) window.lucide.createIcons();
             
             // Stop polling and stop countdown
             if (paymentPollInterval) clearInterval(paymentPollInterval);

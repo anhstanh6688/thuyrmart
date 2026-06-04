@@ -54,8 +54,14 @@ exports.cancelSale = async (req, res) => {
 
 exports.paySale = async (req, res) => {
     try {
-        const success = await Sale.updateStatus(req.params.id, 'completed');
-        if (!success) return res.status(404).json({ error: 'Order not found' });
+        const SaleModel = require('mongoose').model('SaleOrder');
+        const sale = await SaleModel.findById(req.params.id);
+        if (!sale) return res.status(404).json({ error: 'Order not found' });
+        
+        sale.paid_amount = sale.final_amount;
+        sale.status = 'pending'; // Keep status as pending so admin can process delivery
+        await sale.save();
+        
         res.json({ success: true, message: 'Thanh toán thành công' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -186,10 +192,9 @@ exports.bankTransferWebhook = async (req, res) => {
         const totalPaidSoFar = order.paid_amount + amount;
         
         if (totalPaidSoFar >= order.final_amount) {
-            // Fully paid: update status to completed using the service class logic (debt, inventory, logs)
-            const SaleService = require('../models/Sale');
-            await SaleService.updateStatus(orderId, 'completed');
-            console.log(`Order ${orderId} marked as fully paid and completed.`);
+            // Fully paid: update paid_amount and keep status as pending
+            await SaleModel.findByIdAndUpdate(orderId, { paid_amount: order.final_amount, status: 'pending' });
+            console.log(`Order ${orderId} marked as fully paid. Status remains pending.`);
         } else {
             // Partially paid: increment paid_amount
             await SaleModel.findByIdAndUpdate(orderId, { $inc: { paid_amount: amount } });
