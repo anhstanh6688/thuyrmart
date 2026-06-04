@@ -317,6 +317,32 @@
         let currentPage = 1;
         const itemsPerPage = 5;
 
+        function updateCountdowns() {
+            document.querySelectorAll('.countdown-timer').forEach(el => {
+                try {
+                    const expireTime = parseInt(el.getAttribute('data-time'));
+                    if (isNaN(expireTime)) {
+                        el.innerHTML = "Hết hạn";
+                        return;
+                    }
+                    const diff = expireTime - Date.now();
+                    if (diff <= 0) {
+                        el.innerHTML = "Hết hạn";
+                        if (!el.dataset.reloaded) {
+                            el.dataset.reloaded = 'true';
+                            setTimeout(() => window.location.reload(), 2000);
+                        }
+                    } else {
+                        const m = Math.floor(diff / 60000);
+                        const s = Math.floor((diff % 60000) / 1000);
+                        el.innerHTML = `Còn lại: ${m}:${s.toString().padStart(2, '0')}`;
+                    }
+                } catch (e) {
+                    console.error("Error updating countdown element:", e);
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const customerStr = localStorage.getItem('customer');
             if (!customerStr) {
@@ -342,23 +368,8 @@
                 });
 
                 // Start countdown timers
-                setInterval(() => {
-                    document.querySelectorAll('.countdown-timer').forEach(el => {
-                        const expireTime = parseInt(el.getAttribute('data-time'));
-                        const diff = expireTime - Date.now();
-                        if (diff <= 0) {
-                            el.innerHTML = "Hết hạn";
-                            if (!el.dataset.reloaded) {
-                                el.dataset.reloaded = 'true';
-                                setTimeout(() => window.location.reload(), 2000);
-                            }
-                        } else {
-                            const m = Math.floor(diff / 60000);
-                            const s = Math.floor((diff % 60000) / 1000);
-                            el.innerHTML = `Còn lại: ${m}:${s.toString().padStart(2, '0')}`;
-                        }
-                    });
-                }, 1000);
+                updateCountdowns();
+                setInterval(updateCountdowns, 1000);
 
             } catch(e) {
                 console.error(e);
@@ -446,6 +457,7 @@
             });
             
             lucide.createIcons();
+            updateCountdowns();
         }
 
         async function cancelOrder(id) {
