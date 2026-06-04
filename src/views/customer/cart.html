@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng - ThuyR Mart</title>
+    <link rel="stylesheet" href="/css/customer.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                <span style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 20px; color: var(--primary);">ThuyR <span style="color: #059669; font-size: 16px;">Mart</span></span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+            <div class="header-actions">
+                <a href="#" class="action-btn"><i data-lucide="bell" style="width: 20px; height: 20px;"></i></a>
+                <a href="/cart" class="action-btn active">
+                    <i data-lucide="shopping-cart" style="width: 20px; height: 20px;"></i>
+                    <span class="cart-count" id="cart-count-badge">0</span>
+                </a>
+                <a href="/account" class="action-btn"><i data-lucide="user" style="width: 20px; height: 20px;"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <main class="cart-page">
+        <div class="container">
+            <div class="cart-header-section">
+                <h1 class="cart-page-title">Giỏ hàng của bạn</h1>
+                <p class="cart-page-subtitle">Xem lại các mặt hàng văn phòng cao cấp trước khi thanh toán.</p>
+            </div>
+
+            <div class="cart-layout">
+                <!-- Items Column -->
+                <div id="cart-list">
+                    <!-- Dynamic Items Go Here -->
+                </div>
+
+                <!-- Summary Column -->
+                <div>
+                    <div class="cart-summary">
+                        <h2 class="cart-summary-title">Tóm tắt đơn hàng</h2>
+                        
+                        <div class="cart-summary-row">
+                            <span id="summary-items-count">Tạm tính (0 sản phẩm)</span>
+                            <span id="summary-subtotal">0đ</span>
+                        </div>
+                        <div class="cart-summary-row">
+                            <span>Thuế VAT (8%)</span>
+                            <span id="summary-vat">0đ</span>
+                        </div>
+                        <div class="cart-summary-row">
+                            <span>Phí giao hàng</span>
+                            <span style="color: var(--on-surface);">Miễn phí</span>
+                        </div>
+                        
+                        <div class="cart-summary-row total">
+                            <span class="total-label">Tổng cộng</span>
+                            <span class="total-price" id="summary-total">0đ</span>
+                        </div>
+
+                        <button class="btn-checkout" onclick="handleCheckout(event)">
+                            <i data-lucide="lock" style="width: 18px; height: 18px;"></i> Tiến hành thanh toán
+                        </button>
+                        
+                        <div class="cart-secure-text">
+                            Thanh toán an toàn. Hỗ trợ đổi trả trong 30 ngày.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer matches screenshot -->
+            <footer class="footer" style="background-color: var(--surface-container); border-top: 1px solid var(--outline-variant); padding: 60px 0 20px;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                <!-- Company Info -->
+                <div>
+                    <a href="/" class="footer-logo" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 20px;">
+                        <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                        <span style="font-size: 1.5rem; font-weight: 800; color: var(--on-surface); font-family: 'Manrope', sans-serif;">ThuyR Mart</span>
+                    </a>
+                    <p style="color: var(--on-surface-variant); line-height: 1.6; font-size: 0.95rem; margin-bottom: 20px;">
+                        Hệ thống bán lẻ ThuyR Mart cam kết mang đến cho bạn những sản phẩm chất lượng nhất với giá cả hợp lý và dịch vụ tận tâm.
+                    </p>
+                    <div style="display: flex; gap: 16px;">
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="facebook" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="instagram" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="youtube" style="width: 20px; height: 20px;"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Liên kết nhanh</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="/" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Trang chủ</a></li>
+                        <li><a href="/products" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Sản phẩm</a></li>
+                        <li><a href="/about" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Về chúng tôi</a></li>
+                        <li><a href="/contact" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Liên hệ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Customer Support -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Hỗ trợ khách hàng</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách bảo mật</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Điều khoản dịch vụ</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách đổi trả</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Hướng dẫn mua hàng</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Thông tin liên hệ</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px;">
+                        <li style="display: flex; align-items: flex-start; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="map-pin" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>123 Đường Bách Khoa, Quận Hai Bà Trưng, Hà Nội</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="phone" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>0399.501.846</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="mail" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>support@thuyrmart.vn</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div style="border-top: 1px solid var(--outline-variant); padding-top: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                <p style="font-size: 0.9rem; color: var(--on-surface-variant); margin: 0;">
+                    &copy; 2026 ThuyR Mart. All rights reserved.
+                </p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <i data-lucide="credit-card" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="wallet" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="banknote" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/customer.js"></script>
+    <script>
+        lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', renderCart);
+
+        const formatVND = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
+
+        function renderCart() {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const list = document.getElementById('cart-list');
+            const badge = document.getElementById('cart-count-badge');
+            
+            const isEmpty = cart.length === 0;
+
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            // Fix existing carts that might have stored selling_price instead of price
+            cart = cart.map(item => ({...item, price: item.price || item.selling_price || 0}));
+            localStorage.setItem('cart', JSON.stringify(cart));
+            badge.textContent = totalItems;
+
+            if (isEmpty) {
+                list.innerHTML = '<div style="text-align:center; padding: 40px; background: white; border-radius: 8px; border: 1px solid var(--outline-variant);"><p>Giỏ hàng trống</p><a href="/products" style="display:inline-block; margin-top: 10px; color: var(--primary); text-decoration: none; font-weight: 500;">Tiếp tục mua sắm</a></div>';
+            } else {
+                list.innerHTML = cart.map(item => {
+                    const imageHtml = item.image 
+                        ? `<img src="${item.image}" alt="${item.name}">`
+                        : `<i data-lucide="monitor" style="width: 48px; height: 48px; opacity: 0.5;"></i>`;
+
+                    // Generate a default meta if not present
+                    const metaText = item.meta || 'Sản phẩm nội thất văn phòng cao cấp';
+
+                    return `
+                        <div class="cart-item-card">
+                            <div class="cart-item-img">${imageHtml}</div>
+                            <div class="cart-item-info">
+                                <h3 class="cart-item-title">${item.name}</h3>
+                                <p class="cart-item-meta">${metaText}</p>
+                                <div class="cart-qty-control">
+                                    <button class="cart-qty-btn" onclick="updateCartQty('${item.id}', -1)"><i data-lucide="minus" style="width:16px;height:16px;"></i></button>
+                                    <input type="text" class="cart-qty-val" value="${item.quantity}" readonly>
+                                    <button class="cart-qty-btn" onclick="updateCartQty('${item.id}', 1)"><i data-lucide="plus" style="width:16px;height:16px;"></i></button>
+                                </div>
+                            </div>
+                            <div class="cart-item-price">${formatVND(item.price * item.quantity)}</div>
+                            <button class="cart-item-remove" onclick="removeFromCart('${item.id}')"><i data-lucide="x" style="width: 20px; height: 20px;"></i></button>
+                        </div>
+                    `;
+                }).join('');
+                lucide.createIcons();
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const vat = subtotal * 0.08; // 8% VAT per screenshot
+            const total = subtotal + vat;
+
+            document.getElementById('summary-items-count').textContent = `Tạm tính (${totalItems} sản phẩm)`;
+            document.getElementById('summary-subtotal').textContent = formatVND(subtotal);
+            document.getElementById('summary-vat').textContent = formatVND(vat);
+            document.getElementById('summary-total').textContent = formatVND(total);
+        }
+
+        function updateCartQty(id, delta) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity < 1) item.quantity = 1;
+                localStorage.setItem('cart', JSON.stringify(cart));
+                renderCart();
+            }
+        }
+
+        function removeFromCart(id) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart = cart.filter(i => i.id !== id);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        function handleCheckout(e) {
+            if (e) e.preventDefault();
+            if (!localStorage.getItem('customer') && !localStorage.getItem('user')) {
+                if (window.showLoginRequiredDialog) {
+                    window.showLoginRequiredDialog('/checkout');
+                } else {
+                    window.location.href = '/login?redirect=/checkout';
+                }
+            } else {
+                window.location.href = '/checkout';
+            }
+        }
+    </script>
+    <script src="/js/ai-chatbox.js"></script>
+</body>
+</html>

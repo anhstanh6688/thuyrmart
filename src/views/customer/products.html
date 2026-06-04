@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sản phẩm - HTDS Shop</title>
+    <link rel="stylesheet" href="/css/customer.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                <span style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 20px; color: var(--primary);">ThuyR <span style="color: #059669; font-size: 16px;">Mart</span></span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/products" class="active">Products</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+            <div class="header-actions">
+                <a href="#" class="action-btn"><i data-lucide="search"></i></a>
+                <a href="#" class="action-btn"><i data-lucide="bell"></i></a>
+                <a href="/cart" class="action-btn" style="position: relative;">
+                    <i data-lucide="shopping-cart"></i>
+                    <span id="cart-count" class="cart-count">0</span>
+                </a>
+                <a href="/login" class="btn-primary" id="auth-links">Account</a>
+                <div id="user-profile" style="display: none; align-items: center; gap: 8px;">
+                    <a href="/account" style="text-decoration: none; color: var(--on-surface); font-weight: 600;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--surface-container); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 14px;" id="user-initials"></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="products-page">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="/">Trang chủ</a> / <span>Sản phẩm</span>
+            </div>
+            
+            <div class="page-header">
+                <h1>Danh sách sản phẩm</h1>
+                <p>Khám phá bộ sưu tập sản phẩm chất lượng cao, được thiết kế để mang lại hiệu suất và độ tin cậy tối đa cho không gian làm việc hiện đại.</p>
+            </div>
+
+            <div class="products-layout">
+                <!-- Sidebar -->
+                <aside class="filters-sidebar">
+                    <div class="filter-header">
+                        <h3>Bộ lọc</h3>
+                        <a href="#">Xóa lọc</a>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-title">Tìm kiếm</div>
+                        <div class="filter-search">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="search-input" placeholder="Tên sản phẩm...">
+                        </div>
+                    </div>
+
+                    <div class="filter-group" id="category-filter-group">
+                        <div class="filter-title">Danh mục</div>
+                        <div id="category-list">
+                            <!-- Categories will be loaded via JS -->
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-title">Khoảng giá: <span id="price-value" style="color: var(--primary); font-weight: 700;">Dưới 500.000đ</span></div>
+                        <div style="padding: 10px 0;">
+                            <input type="range" id="price-slider" min="0" max="500000" step="5000" value="500000" style="width: 100%; accent-color: var(--primary);">
+                            <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; color: var(--on-surface-variant); font-weight: 500;">
+                                <span>0đ</span>
+                                <span id="price-max-label">500.000đ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-title">Đánh giá</div>
+                        <label class="filter-radio">
+                            <input type="radio" name="rating" value="all" checked class="rating-radio">
+                            <span>Tất cả</span>
+                        </label>
+                        <label class="filter-radio">
+                            <input type="radio" name="rating" value="5" class="rating-radio">
+                            <div class="star-rating">
+                                <i data-lucide="star" style="fill: currentColor; width: 14px; height: 14px;"></i>
+                                <i data-lucide="star" style="fill: currentColor; width: 14px; height: 14px;"></i>
+                                <i data-lucide="star" style="fill: currentColor; width: 14px; height: 14px;"></i>
+                                <i data-lucide="star" style="fill: currentColor; width: 14px; height: 14px;"></i>
+                                <i data-lucide="star" style="fill: currentColor; width: 14px; height: 14px;"></i>
+                            </div>
+                            <span>5 sao</span>
+                        </label>
+                        <label class="filter-radio">
+                            <input type="radio" name="rating" value="4" class="rating-radio">
+                            <div class="star-rating">
+                                <i data-lucide="star" style="fill: currentColor; width: 14px; height: 14px;"></i>
+                                <i data-lucide="star" style="fill: currentColor; width: 14px; height: 14px;"></i>
+                                <i data-lucide="star" style="fill: currentColor; width: 14px; height: 14px;"></i>
+                                <i data-lucide="star" style="fill: currentColor; width: 14px; height: 14px;"></i>
+                                <i data-lucide="star" style="width: 14px; height: 14px;"></i>
+                            </div>
+                            <span>Từ 4 sao</span>
+                        </label>
+                        <label class="filter-radio">
+                            <input type="radio" name="rating" value="3" class="rating-radio">
+                            <div class="star-rating">
+                                <i data-lucide="star" style="fill: currentColor; width: 14px; height: 14px;"></i>
+                                <i data-lucide="star" style="fill: currentColor; width: 14px; height: 14px;"></i>
+                                <i data-lucide="star" style="fill: currentColor; width: 14px; height: 14px;"></i>
+                                <i data-lucide="star" style="width: 14px; height: 14px;"></i>
+                                <i data-lucide="star" style="width: 14px; height: 14px;"></i>
+                            </div>
+                            <span>Từ 3 sao</span>
+                        </label>
+                    </div>
+                </aside>
+
+                <!-- Content -->
+                <section class="products-content">
+                    <div class="products-bar">
+                        <div class="products-bar-text" id="products-count-text">Hiển thị <strong>1-12</strong> trong số <strong>...</strong> sản phẩm</div>
+                        <div class="sort-box">
+                            Sắp xếp theo:
+                            <select class="sort-select" id="sort-select">
+                                <option value="newest">Mới nhất</option>
+                                <option value="price_asc">Giá thấp đến cao</option>
+                                <option value="price_desc">Giá cao đến thấp</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="products-grid" id="products-grid">
+                        <!-- Products will be loaded via JS -->
+                        
+                        <!-- Skeleton loading items -->
+                        <div class="product-card" style="opacity: 0.6;">
+                            <div class="product-img-wrap" style="background: var(--surface-container);"></div>
+                            <div class="product-info">
+                                <div style="width: 60px; height: 20px; background: var(--surface-container); border-radius: 100px; margin-bottom: 12px;"></div>
+                                <div style="width: 100%; height: 20px; background: var(--surface-container); border-radius: 4px; margin-bottom: 8px;"></div>
+                                <div style="width: 60%; height: 20px; background: var(--surface-container); border-radius: 4px; margin-bottom: 16px;"></div>
+                                <div class="product-bottom">
+                                    <div style="width: 80px; height: 24px; background: var(--surface-container); border-radius: 4px;"></div>
+                                    <div style="width: 40px; height: 40px; background: var(--surface-container); border-radius: 8px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <div class="pagination" id="products-pagination">
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+                <footer class="footer" style="background-color: var(--surface-container); border-top: 1px solid var(--outline-variant); padding: 60px 0 20px;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                <!-- Company Info -->
+                <div>
+                    <a href="/" class="footer-logo" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 20px;">
+                        <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                        <span style="font-size: 1.5rem; font-weight: 800; color: var(--on-surface); font-family: 'Manrope', sans-serif;">ThuyR Mart</span>
+                    </a>
+                    <p style="color: var(--on-surface-variant); line-height: 1.6; font-size: 0.95rem; margin-bottom: 20px;">
+                        Hệ thống bán lẻ ThuyR Mart cam kết mang đến cho bạn những sản phẩm chất lượng nhất với giá cả hợp lý và dịch vụ tận tâm.
+                    </p>
+                    <div style="display: flex; gap: 16px;">
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="facebook" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="instagram" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="youtube" style="width: 20px; height: 20px;"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Liên kết nhanh</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="/" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Trang chủ</a></li>
+                        <li><a href="/products" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Sản phẩm</a></li>
+                        <li><a href="/about" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Về chúng tôi</a></li>
+                        <li><a href="/contact" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Liên hệ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Customer Support -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Hỗ trợ khách hàng</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách bảo mật</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Điều khoản dịch vụ</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách đổi trả</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Hướng dẫn mua hàng</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Thông tin liên hệ</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px;">
+                        <li style="display: flex; align-items: flex-start; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="map-pin" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>123 Đường Bách Khoa, Quận Hai Bà Trưng, Hà Nội</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="phone" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>0399.501.846</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="mail" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>support@thuyrmart.vn</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div style="border-top: 1px solid var(--outline-variant); padding-top: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                <p style="font-size: 0.9rem; color: var(--on-surface-variant); margin: 0;">
+                    &copy; 2026 ThuyR Mart. All rights reserved.
+                </p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <i data-lucide="credit-card" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="wallet" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="banknote" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/customer.js"></script>
+    <script src="/js/pagination.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            let allProducts = await window.loadAllProducts();
+            let currentPage = 1;
+            const itemsPerPage = 6;
+            
+            // Dynamically set up price slider based on catalog
+            const prices = allProducts.map(p => p.selling_price || 0);
+            const maxPrice = prices.length > 0 ? Math.max(...prices) : 500000;
+            const priceSlider = document.getElementById('price-slider');
+            const priceValue = document.getElementById('price-value');
+            const priceMaxLabel = document.getElementById('price-max-label');
+            
+            if (priceSlider) {
+                priceSlider.max = maxPrice;
+                priceSlider.value = maxPrice;
+                if (priceMaxLabel) priceMaxLabel.textContent = window.formatCurrency(maxPrice);
+                if (priceValue) priceValue.textContent = `Dưới ${window.formatCurrency(maxPrice)}`;
+                
+                priceSlider.addEventListener('input', () => {
+                    if (priceValue) priceValue.textContent = `Dưới ${window.formatCurrency(priceSlider.value)}`;
+                    applyFilters();
+                });
+            }
+
+            // Render specific grid
+            const renderGrid = (products) => {
+                const grid = document.getElementById('products-grid');
+                if(products.length === 0) {
+                    grid.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--on-surface-variant); grid-column: 1/-1;">Không tìm thấy sản phẩm nào.</div>';
+                    document.getElementById('products-pagination').innerHTML = '';
+                    document.getElementById('products-count-text').innerHTML = `Hiển thị <strong>0</strong> sản phẩm`;
+                } else {
+                    // Paginate
+                    const startIdx = (currentPage - 1) * itemsPerPage;
+                    const paginated = products.slice(startIdx, startIdx + itemsPerPage);
+                    window.renderProducts(paginated, grid);
+                    
+                    window.renderPagination(products.length, itemsPerPage, currentPage, document.getElementById('products-pagination'), (newPage) => {
+                        currentPage = newPage;
+                        renderGrid(products);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    });
+                    
+                    const endIdx = Math.min(startIdx + itemsPerPage, products.length);
+                    document.getElementById('products-count-text').innerHTML = `Hiển thị <strong>${startIdx + 1}-${endIdx}</strong> trong số <strong>${products.length}</strong> sản phẩm`;
+                }
+            };
+            
+            renderGrid(allProducts);
+
+            const applyFilters = () => {
+                let filtered = [...allProducts];
+                
+                // 1. Search filter
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+                if(searchTerm) {
+                    filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm));
+                }
+                
+                // 2. Category filter
+                const checkedCats = Array.from(document.querySelectorAll('.cat-checkbox:checked')).map(cb => cb.value);
+                if(checkedCats.length > 0) {
+                    filtered = filtered.filter(p => checkedCats.includes(String(p.category_id)));
+                }
+                
+                // 3. Price range filter
+                if (priceSlider) {
+                    const currentMaxPrice = parseFloat(priceSlider.value);
+                    filtered = filtered.filter(p => (p.selling_price || 0) <= currentMaxPrice);
+                }
+
+                // 4. Rating filter
+                const selectedRatingEl = document.querySelector('.rating-radio:checked');
+                if (selectedRatingEl && selectedRatingEl.value !== 'all') {
+                    const minStars = parseFloat(selectedRatingEl.value);
+                    filtered = filtered.filter(p => (p.average_rating || 0) >= minStars);
+                }
+                
+                // 5. Sorting
+                const sortVal = document.getElementById('sort-select').value;
+                if(sortVal === 'price_asc') filtered.sort((a,b) => a.selling_price - b.selling_price);
+                else if(sortVal === 'price_desc') filtered.sort((a,b) => b.selling_price - a.selling_price);
+                else filtered.sort((a,b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+                
+                currentPage = 1;
+                renderGrid(filtered);
+            };
+
+            // Event listeners
+            document.getElementById('search-input').addEventListener('input', applyFilters);
+            document.getElementById('sort-select').addEventListener('change', applyFilters);
+            document.querySelectorAll('.rating-radio').forEach(radio => {
+                radio.addEventListener('change', applyFilters);
+            });
+            document.querySelector('.filter-header a').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('search-input').value = '';
+                document.querySelectorAll('.cat-checkbox').forEach(cb => cb.checked = false);
+                document.getElementById('sort-select').value = 'newest';
+                
+                // Reset price slider
+                if (priceSlider) {
+                    priceSlider.value = maxPrice;
+                    if (priceValue) priceValue.textContent = `Dưới ${window.formatCurrency(maxPrice)}`;
+                }
+                
+                // Reset rating radios
+                const defaultRatingRadio = document.querySelector('.rating-radio[value="all"]');
+                if (defaultRatingRadio) defaultRatingRadio.checked = true;
+                
+                applyFilters();
+            });
+
+            // Load Categories dynamically
+            try {
+                const res = await fetch('/api/categories');
+                const categories = await res.json();
+                const catList = document.getElementById('category-list');
+                
+                catList.innerHTML = categories.map((cat) => `
+                    <label class="filter-checkbox">
+                        <input type="checkbox" class="cat-checkbox" value="${cat.id}"> ${cat.name}
+                    </label>
+                `).join('');
+                
+                document.querySelectorAll('.cat-checkbox').forEach(cb => {
+                    cb.addEventListener('change', applyFilters);
+                });
+            } catch (err) {
+                console.error('Failed to load categories', err);
+            }
+        });
+    </script>
+    <script src="/js/ai-chatbox.js"></script>
+</body>
+</html>

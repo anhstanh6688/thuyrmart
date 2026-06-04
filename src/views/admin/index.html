@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTDS - Hệ Thống Quản Lý Bán Hàng</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header" style="padding: 16px 24px;">
+                <img src="/img/logo.png" alt="Logo" class="logo-icon" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                <span class="logo-text" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 20px;">ThuyR <span style="color: #059669; font-size: 16px;">Mart</span></span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="dashboard">
+                    <i data-lucide="layout-dashboard"></i> <span>Tổng quan</span>
+                </a>
+                <a href="#" class="nav-item" data-page="pos">
+                    <i data-lucide="monitor-smartphone"></i> <span>Bán hàng (POS)</span>
+                </a>
+                <a href="#" class="nav-item" data-page="products">
+                    <i data-lucide="package"></i> <span>Sản phẩm</span>
+                </a>
+                <a href="#" class="nav-item" data-page="categories">
+                    <i data-lucide="tags"></i> <span>Danh mục</span>
+                </a>
+                <a href="#" class="nav-item" data-page="stock-in">
+                    <i data-lucide="download"></i> <span>Nhập hàng</span>
+                </a>
+                <a href="#" class="nav-item" data-page="suppliers">
+                    <i data-lucide="truck"></i> <span>Nhà cung cấp</span>
+                </a>
+                <a href="#" class="nav-item" data-page="inventory-logs">
+                    <i data-lucide="clipboard-list"></i> <span>Nhật ký kho</span>
+                </a>
+                <a href="#" class="nav-item" data-page="customers">
+                    <i data-lucide="users"></i> <span>Khách hàng</span>
+                </a>
+                <a href="#" class="nav-item" data-page="sales-history">
+                    <i data-lucide="history"></i> <span>Lịch sử bán</span>
+                </a>
+                <a href="#" class="nav-item" data-page="users">
+                    <i data-lucide="shield"></i> <span>Nhân viên</span>
+                </a>
+                <a href="#" class="nav-item" data-page="reports">
+                    <i data-lucide="line-chart"></i> <span>Báo cáo</span>
+                </a>
+                <div class="sidebar-footer" style="padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
+                    <button id="logout-btn" style="background: none; border: none; color: #94a3b8; display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-size: 0.875rem;">
+                        <i data-lucide="log-out"></i> <span>Đăng xuất</span>
+                    </button>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="toggle-sidebar" id="toggle-sidebar">
+                    <i data-lucide="menu"></i>
+                </div>
+                <div class="search-bar">
+                    <i data-lucide="search"></i>
+                    <input type="text" placeholder="Tìm kiếm nhanh...">
+                </div>
+                <div class="user-profile">
+                    <span class="user-name">Quản trị viên</span>
+                    <div class="user-avatar">AD</div>
+                </div>
+            </header>
+
+            <div id="page-content" class="content-body">
+                <!-- Content will be loaded here via JS -->
+                <div class="loading-spinner">
+                    <i data-lucide="loader-2" class="fa-spin"></i>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="/js/pagination.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/ai-chatbox.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

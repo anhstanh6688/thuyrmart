@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết sản phẩm - HTDS Shop</title>
+    <link rel="stylesheet" href="/css/customer.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        #tab-reviews .mb-3 { margin-bottom: 1.25rem; }
+        #tab-reviews label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--on-surface); font-size: 0.95rem; }
+        #tab-reviews .form-control {
+            display: block; width: 100%; padding: 0.75rem 1rem; font-size: 1rem; line-height: 1.5; color: var(--on-surface);
+            background-color: #fff; border: 1px solid var(--outline-variant); border-radius: 8px;
+            transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;
+        }
+        #tab-reviews .form-control:focus {
+            border-color: var(--primary); outline: 0; box-shadow: 0 0 0 3px var(--primary-container);
+        }
+        .review-form-container {
+            background: var(--surface-container-low); padding: 24px; border-radius: 12px;
+        }
+        .review-item {
+            padding: 20px; background: #fff; border: 1px solid var(--outline-variant);
+            border-radius: 12px; margin-bottom: 16px; transition: transform 0.2s;
+        }
+        .review-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .review-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .review-author { font-weight: 700; color: var(--on-surface); display: flex; align-items: center; gap: 10px; }
+        .review-avatar {
+            width: 36px; height: 36px; background: var(--primary-container); color: var(--primary);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px;
+        }
+        .review-date { color: var(--on-surface-variant); font-size: 13px; }
+        .review-stars { color: #f59e0b; margin-bottom: 8px; font-size: 15px; letter-spacing: 2px; }
+        .review-text { margin: 0; color: var(--on-surface-variant); line-height: 1.6; font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                <span style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 20px; color: var(--primary);">ThuyR <span style="color: #059669; font-size: 16px;">Mart</span></span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/products" class="active">Products</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+            <div class="header-actions">
+                <a href="#" class="action-btn"><i data-lucide="search"></i></a>
+                <a href="#" class="action-btn"><i data-lucide="bell"></i></a>
+                <a href="/cart" class="action-btn" style="position: relative;">
+                    <i data-lucide="shopping-cart"></i>
+                    <span id="cart-count" class="cart-count">0</span>
+                </a>
+                <a href="/login" class="btn-primary" id="auth-links">Account</a>
+                <div id="user-profile" style="display: none; align-items: center; gap: 8px;">
+                    <a href="/account" style="text-decoration: none; color: var(--on-surface); font-weight: 600;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--surface-container); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 14px;" id="user-initials"></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="detail-page">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="/">Trang chủ</a> / <a href="/products">Sản phẩm</a> / <span id="product-breadcrumb-name">Đang tải...</span>
+            </div>
+
+            <div class="detail-layout" id="product-detail-container">
+                <!-- Loading State -->
+                <div style="grid-column: span 2; text-align: center; padding: 100px;">
+                    <i data-lucide="loader-2" class="lucide-spin" style="width: 48px; height: 48px; color: var(--primary);"></i>
+                    <p style="margin-top: 16px; color: var(--on-surface-variant);">Đang tải thông tin sản phẩm...</p>
+                </div>
+            </div>
+
+            <div class="detail-tabs-section">
+                <div class="tabs-header">
+                    <button class="tab-btn active" data-target="tab-desc">Mô tả chi tiết</button>
+                    <button class="tab-btn" data-target="tab-specs">Thông số kỹ thuật</button>
+                    <button class="tab-btn" data-target="tab-reviews" id="tab-btn-reviews">Đánh giá (0)</button>
+                    <button class="tab-btn" data-target="tab-policy">Chính sách bảo hành</button>
+                </div>
+                
+                <div class="tab-content active" id="tab-desc">
+                    <div id="product-full-desc">Đang tải mô tả...</div>
+                </div>
+                
+                <div class="tab-content" id="tab-specs" style="display: none;">
+                    <table class="specs-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                        <tr><td style="padding: 12px; border: 1px solid var(--outline-variant); width: 30%; background: var(--surface-container-low); font-weight: 600;">Mã sản phẩm (SKU)</td><td style="padding: 12px; border: 1px solid var(--outline-variant);" id="spec-sku">---</td></tr>
+                        <tr><td style="padding: 12px; border: 1px solid var(--outline-variant); width: 30%; background: var(--surface-container-low); font-weight: 600;">Danh mục</td><td style="padding: 12px; border: 1px solid var(--outline-variant);" id="spec-category">---</td></tr>
+                        <tr><td style="padding: 12px; border: 1px solid var(--outline-variant); width: 30%; background: var(--surface-container-low); font-weight: 600;">Đơn vị tính</td><td style="padding: 12px; border: 1px solid var(--outline-variant);" id="spec-unit">---</td></tr>
+                        <tr><td style="padding: 12px; border: 1px solid var(--outline-variant); width: 30%; background: var(--surface-container-low); font-weight: 600;">Tình trạng</td><td style="padding: 12px; border: 1px solid var(--outline-variant);" id="spec-stock">---</td></tr>
+                    </table>
+                </div>
+                
+                <div class="tab-content" id="tab-reviews" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 40px;">
+                        <div class="review-form-container">
+                            <h4 style="margin-bottom: 20px; font-size: 1.2rem;">Gửi đánh giá của bạn</h4>
+                            <form id="review-form" onsubmit="submitReview(event)">
+                                <div class="mb-3">
+                                    <label>Tên của bạn</label>
+                                    <input type="text" id="review-name" class="form-control" required placeholder="Nhập tên...">
+                                </div>
+                                <div class="mb-3">
+                                    <label>Đánh giá (1-5 sao)</label>
+                                    <select id="review-rating" class="form-control" required>
+                                        <option value="5">5 Sao - Tuyệt vời</option>
+                                        <option value="4">4 Sao - Tốt</option>
+                                        <option value="3">3 Sao - Bình thường</option>
+                                        <option value="2">2 Sao - Kém</option>
+                                        <option value="1">1 Sao - Tệ</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Nhận xét</label>
+                                    <textarea id="review-comment" class="form-control" rows="4" required placeholder="Nhập cảm nhận của bạn về sản phẩm..."></textarea>
+                                </div>
+                                <div style="display: flex; justify-content: center; width: 100%; margin-top: 16px;">
+                                    <button type="submit" class="btn-primary" style="display: inline-flex; align-items: center; justify-content: center; text-align: center; width: auto; min-width: 180px; padding: 12px 24px; border-radius: 8px; border: none; font-weight: 600; font-size: 1rem; cursor: pointer;">Gửi Đánh Giá</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div>
+                            <h4 style="margin-bottom: 20px; font-size: 1.2rem;">Khách hàng nhận xét</h4>
+                            <div id="reviews-list">
+                                <div style="text-align: center; padding: 40px; color: var(--on-surface-variant);">
+                                    <i data-lucide="message-square" style="width: 48px; height: 48px; opacity: 0.5; margin-bottom: 12px;"></i>
+                                    <p>Đang tải đánh giá...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="tab-policy" style="display: none;">
+                    <div style="padding: 20px; background: var(--surface-container-low); border-radius: 8px;">
+                        <h4 style="margin-bottom: 12px; color: var(--primary);">Chính sách bảo hành & Đổi trả</h4>
+                        <ul style="padding-left: 20px; color: var(--on-surface); line-height: 1.8;">
+                            <li>Bảo hành chính hãng 12 tháng tại các trung tâm bảo hành ủy quyền.</li>
+                            <li>Đổi mới trong 7 ngày đầu tiên nếu có lỗi từ nhà sản xuất.</li>
+                            <li>Hỗ trợ kỹ thuật trọn đời sản phẩm.</li>
+                            <li>Miễn phí vận chuyển cho đơn hàng bảo hành.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+                <footer class="footer" style="background-color: var(--surface-container); border-top: 1px solid var(--outline-variant); padding: 60px 0 20px;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                <!-- Company Info -->
+                <div>
+                    <a href="/" class="footer-logo" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 20px;">
+                        <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                        <span style="font-size: 1.5rem; font-weight: 800; color: var(--on-surface); font-family: 'Manrope', sans-serif;">ThuyR Mart</span>
+                    </a>
+                    <p style="color: var(--on-surface-variant); line-height: 1.6; font-size: 0.95rem; margin-bottom: 20px;">
+                        Hệ thống bán lẻ ThuyR Mart cam kết mang đến cho bạn những sản phẩm chất lượng nhất với giá cả hợp lý và dịch vụ tận tâm.
+                    </p>
+                    <div style="display: flex; gap: 16px;">
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="facebook" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="instagram" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="youtube" style="width: 20px; height: 20px;"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Liên kết nhanh</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="/" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Trang chủ</a></li>
+                        <li><a href="/products" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Sản phẩm</a></li>
+                        <li><a href="/about" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Về chúng tôi</a></li>
+                        <li><a href="/contact" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Liên hệ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Customer Support -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Hỗ trợ khách hàng</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách bảo mật</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Điều khoản dịch vụ</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách đổi trả</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Hướng dẫn mua hàng</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Thông tin liên hệ</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px;">
+                        <li style="display: flex; align-items: flex-start; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="map-pin" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>123 Đường Bách Khoa, Quận Hai Bà Trưng, Hà Nội</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="phone" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>0399.501.846</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="mail" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>support@thuyrmart.vn</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div style="border-top: 1px solid var(--outline-variant); padding-top: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                <p style="font-size: 0.9rem; color: var(--on-surface-variant); margin: 0;">
+                    &copy; 2026 ThuyR Mart. All rights reserved.
+                </p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <i data-lucide="credit-card" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="wallet" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="banknote" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/customer.js"></script>
+    <script>
+        lucide.createIcons();
+        let currentProduct = null;
+        let editingReviewId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const pathParts = window.location.pathname.split('/');
+            let productId = pathParts[pathParts.length - 1];
+            
+            if (!productId || productId === 'product-detail.html' || productId === 'products') {
+                const urlParams = new URLSearchParams(window.location.search);
+                productId = urlParams.get('id');
+            }
+
+            if (productId) {
+                loadProduct(productId);
+            } else {
+                document.getElementById('product-detail-container').innerHTML = 
+                    '<div style="grid-column: span 2; text-align: center; padding: 100px;"><h2>Sản phẩm không xác định</h2></div>';
+            }
+        });
+
+        async function loadProduct(id) {
+            const container = document.getElementById('product-detail-container');
+            const breadcrumbName = document.getElementById('product-breadcrumb-name');
+
+            try {
+                const res = await fetch(`/api/products/${id}`);
+                const product = await res.json();
+                currentProduct = product;
+
+                if (res.status === 404 || !product) {
+                    container.innerHTML = '<div style="grid-column: span 2; text-align: center; padding: 100px;"><h2>Sản phẩm không tồn tại</h2><a href="/products" class="btn-primary">Quay lại cửa hàng</a></div>';
+                    return;
+                }
+
+                document.title = `${product.name} - HTDS Shop`;
+                breadcrumbName.textContent = product.name;
+                document.getElementById('product-full-desc').innerHTML = product.description || 'Chưa có mô tả chi tiết cho sản phẩm này.';
+                
+                // Populate specs
+                document.getElementById('spec-sku').textContent = product.sku || '---';
+                document.getElementById('spec-category').textContent = product.category_name || 'Khác';
+                document.getElementById('spec-unit').textContent = product.unit || 'Cái';
+                document.getElementById('spec-stock').textContent = product.stock_quantity > 0 ? `Còn hàng (${product.stock_quantity} ${product.unit || 'Cái'})` : 'Hết hàng';
+
+                const images = product.images && product.images.length > 0 ? product.images : [];
+                const firstImage = images.length > 0 ? images[0] : null;
+
+                const imageHtml = firstImage 
+                    ? `<img src="${firstImage}" alt="${product.name}" id="main-product-image">`
+                    : `<div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; background:var(--surface-container-low);"><i data-lucide="image" style="width: 64px; height: 64px; color: var(--outline);"></i></div>`;
+                
+                // Build thumbs
+                let thumbsHtml = '';
+                for (let i = 0; i < 4; i++) {
+                    if (i < images.length) {
+                        thumbsHtml += `<div class="detail-thumb ${i===0?'active':''}" onclick="document.getElementById('main-product-image').src='${images[i]}'; document.querySelectorAll('.detail-thumb').forEach(el=>el.classList.remove('active')); this.classList.add('active');"><img src="${images[i]}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;"></div>`;
+                    } else {
+                        thumbsHtml += `<div class="detail-thumb"><div style="background:var(--surface-container); width:100%; height:100%; border-radius:6px;"></div></div>`;
+                    }
+                }
+                if (product.video) {
+                    thumbsHtml += `
+                    <div class="detail-thumb" style="background: var(--primary-fixed); display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="window.open('${product.video}', '_blank')">
+                        <i data-lucide="play-circle" style="color: var(--on-surface-variant); width: 24px; height: 24px;"></i>
+                    </div>`;
+                }
+
+                container.innerHTML = `
+                    <div class="detail-gallery">
+                        <div class="detail-main-img">${imageHtml}</div>
+                        <div class="detail-thumbs">
+                            ${thumbsHtml}
+                        </div>
+                    </div>
+                    <div class="detail-info">
+                        <div class="detail-badge-row">
+                            <span class="badge-stock"><i data-lucide="check-circle-2" style="width: 14px; height: 14px;"></i> Còn hàng</span>
+                            <span class="detail-sku">SKU: ${product.id || 'N/A'}</span>
+                        </div>
+                        
+                        <h1 class="detail-title">${product.name}</h1>
+                        
+                        <div class="detail-rating">
+                            <div class="stars">
+                                <i data-lucide="star" style="fill: ${product.average_rating >= 1 ? 'currentColor' : 'none'}; width: 16px; height: 16px; color: #f59e0b;"></i>
+                                <i data-lucide="star" style="fill: ${product.average_rating >= 2 ? 'currentColor' : 'none'}; width: 16px; height: 16px; color: #f59e0b;"></i>
+                                <i data-lucide="star" style="fill: ${product.average_rating >= 3 ? 'currentColor' : 'none'}; width: 16px; height: 16px; color: #f59e0b;"></i>
+                                <i data-lucide="star" style="fill: ${product.average_rating >= 4 ? 'currentColor' : 'none'}; width: 16px; height: 16px; color: #f59e0b;"></i>
+                                <i data-lucide="star" style="fill: ${product.average_rating >= 5 ? 'currentColor' : 'none'}; width: 16px; height: 16px; color: #f59e0b;"></i>
+                            </div>
+                            <span>${product.average_rating || 0} (${product.review_count || 0} đánh giá)</span>
+                        </div>
+
+                        <div class="detail-pricing">
+                            <span class="detail-price">${window.formatCurrency(product.selling_price)}</span>
+                            ${product.price > product.selling_price ? `<span class="detail-old-price">${window.formatCurrency(product.price)}</span>` : ''}
+                        </div>
+
+                        <div class="detail-divider"></div>
+                        <div class="detail-actions">
+                            <div class="qty-row">
+                                <span class="qty-label">Số lượng:</span>
+                                <div class="qty-box">
+                                    <button class="qty-btn" onclick="updateQty(-1)"><i data-lucide="minus" style="width: 18px; height: 18px;"></i></button>
+                                    <input type="text" class="qty-input" id="detail-qty" value="1" readonly>
+                                    <button class="qty-btn" onclick="updateQty(1)"><i data-lucide="plus" style="width: 18px; height: 18px;"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="btn-row" style="display: flex; gap: 10px;">
+                                <button class="btn-large btn-solid-blue" onclick="handleAddToCart()" style="font-size: 13.5px; padding: 14px 8px; white-space: nowrap; gap: 6px; flex: 1.15; outline: none; border-radius: 8px;">
+                                    <i data-lucide="shopping-cart" style="width: 18px; height: 18px; flex-shrink: 0;"></i> Thêm vào giỏ
+                                </button>
+                                <button class="btn-large btn-outline-blue" onclick="buyNow()" style="font-size: 13.5px; padding: 14px 8px; white-space: nowrap; gap: 6px; flex: 0.85; outline: none; border-radius: 8px;">
+                                    <i data-lucide="zap" style="width: 18px; height: 18px; flex-shrink: 0;"></i> Mua ngay
+                                </button>
+                            </div>
+                        </div>
+                        <div class="detail-benefits" style="margin-top: 32px; padding: 16px; background: var(--surface-container-lowest); border-radius: 12px; border: 1px solid var(--outline-variant); display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 24px;">
+                            <div class="benefit-item" style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; color: var(--on-surface);"><i data-lucide="shield-check" style="color: #2563eb; width: 18px; height: 18px; flex-shrink: 0;"></i> Bảo hành 5 năm</div>
+                            <div class="benefit-item" style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; color: var(--on-surface);"><i data-lucide="truck" style="color: #2563eb; width: 18px; height: 18px; flex-shrink: 0;"></i> Giao hàng miễn phí</div>
+                            <div class="benefit-item" style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; color: var(--on-surface);"><i data-lucide="refresh-cw" style="color: #2563eb; width: 18px; height: 18px; flex-shrink: 0;"></i> Đổi mới trong 7 ngày</div>
+                            <div class="benefit-item" style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; color: var(--on-surface);"><i data-lucide="headphones" style="color: #2563eb; width: 18px; height: 18px; flex-shrink: 0;"></i> Hỗ trợ kỹ thuật 24/7</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Column 3: Store & Shipping Commitments (Premium Sidebar Widget) -->
+                    <div style="background: white; border: 1px solid var(--outline-variant); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: var(--shadow-sm); position: sticky; top: 100px;">
+                        <!-- Store Info Header -->
+                        <div style="display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--outline-variant); padding-bottom: 16px;">
+                            <img src="/img/logo.png" alt="Logo" style="width: 48px; height: 48px; border-radius: 12px; object-fit: cover; border: 1px solid var(--outline-variant); flex-shrink: 0;">
+                            <div style="text-align: left;">
+                                <h4 style="font-size: 15px; font-weight: 700; color: var(--on-surface); margin: 0;">HTDS - ThuyR Mart</h4>
+                                <span style="font-size: 12px; color: var(--on-surface-variant); font-weight: 500;">Tổ dân phố Thư Đôi, Bắc Ninh</span>
+                            </div>
+                        </div>
+
+                        <!-- Trust Commitments List -->
+                        <div style="display: flex; flex-direction: column; gap: 16px; text-align: left;">
+                            <!-- Delivery -->
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="color: #2563eb; margin-top: 2px; flex-shrink: 0;"><i data-lucide="truck" style="width: 18px; height: 18px;"></i></div>
+                                <div>
+                                    <h5 style="font-size: 13px; font-weight: 700; margin: 0 0 2px 0; color: var(--on-surface);">Giao hàng siêu tốc</h5>
+                                    <p style="font-size: 12px; color: var(--on-surface-variant); margin: 0; line-height: 1.5;">Giao trong ngày tại Bắc Ninh & Hà Nội. Ship COD toàn quốc.</p>
+                                </div>
+                            </div>
+                            <!-- Authenticity -->
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="color: #10b981; margin-top: 2px; flex-shrink: 0;"><i data-lucide="shield-check" style="width: 18px; height: 18px;"></i></div>
+                                <div>
+                                    <h5 style="font-size: 13px; font-weight: 700; margin: 0 0 2px 0; color: var(--on-surface);">100% Chính hãng</h5>
+                                    <p style="font-size: 12px; color: var(--on-surface-variant); margin: 0; line-height: 1.5;">Cam kết chất lượng đạt chuẩn. Hoàn tiền 200% nếu phát hiện giả mạo.</p>
+                                </div>
+                            </div>
+                            <!-- Guarantee & Returns -->
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="color: #d97706; margin-top: 2px; flex-shrink: 0;"><i data-lucide="refresh-cw" style="width: 18px; height: 18px;"></i></div>
+                                <div>
+                                    <h5 style="font-size: 13px; font-weight: 700; margin: 0 0 2px 0; color: var(--on-surface);">Đổi trả nhanh chóng</h5>
+                                    <p style="font-size: 12px; color: var(--on-surface-variant); margin: 0; line-height: 1.5;">Miễn phí đổi trả trong 7 ngày nếu lỗi từ nhà sản xuất.</p>
+                                </div>
+                            </div>
+                            <!-- Working Hours -->
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="color: #4f46e5; margin-top: 2px; flex-shrink: 0;"><i data-lucide="clock" style="width: 18px; height: 18px;"></i></div>
+                                <div>
+                                    <h5 style="font-size: 13px; font-weight: 700; margin: 0 0 2px 0; color: var(--on-surface);">Thời gian mở cửa</h5>
+                                    <p style="font-size: 12px; color: var(--on-surface-variant); margin: 0; line-height: 1.5;">Mở cửa: 08:00 - 22:00 (Cả ngày lễ & Chủ Nhật).</p>
+                                </div>
+                            </div>
+                            <!-- Inspection Benefit -->
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="color: #9333ea; margin-top: 2px; flex-shrink: 0;"><i data-lucide="package-search" style="width: 18px; height: 18px;"></i></div>
+                                <div>
+                                    <h5 style="font-size: 13px; font-weight: 700; margin: 0 0 2px 0; color: var(--on-surface);">Đồng kiểm hàng hóa</h5>
+                                    <p style="font-size: 12px; color: var(--on-surface-variant); margin: 0; line-height: 1.5;">Hỗ trợ kiểm tra hàng thoải mái trước khi nhận và thanh toán.</p>
+                                </div>
+                            </div>
+                            <!-- Secure Payment -->
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="color: #db2777; margin-top: 2px; flex-shrink: 0;"><i data-lucide="credit-card" style="width: 18px; height: 18px;"></i></div>
+                                <div>
+                                    <h5 style="font-size: 13px; font-weight: 700; margin: 0 0 2px 0; color: var(--on-surface);">Thanh toán an toàn</h5>
+                                    <p style="font-size: 12px; color: var(--on-surface-variant); margin: 0; line-height: 1.5;">VietQR, ví điện tử hoặc tiền mặt khi nhận hàng.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hotline/Contact info -->
+                        <div style="background: var(--surface-container-low); border-radius: 12px; padding: 12px 16px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px dashed var(--outline-variant);">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i data-lucide="phone-call" style="width: 16px; height: 16px; color: var(--primary); flex-shrink: 0;"></i>
+                                <span style="font-size: 12px; font-weight: 600; color: var(--on-surface);">Hotline 24/7</span>
+                            </div>
+                            <a href="tel:0383303180" style="font-size: 13px; font-weight: 700; color: var(--primary); text-decoration: none;">0383.303.180</a>
+                        </div>
+                    </div>
+                `;
+
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+
+                // Update reviews tab title
+                const reviewBtn = document.getElementById('tab-btn-reviews');
+                if (reviewBtn) {
+                    reviewBtn.textContent = `Đánh giá (${product.review_count || 0})`;
+                }
+
+                // Load reviews & verify auth state
+                loadReviews(product.id);
+                checkReviewAuth();
+
+                const tabBtns = document.querySelectorAll('.tab-btn');
+                const tabContents = document.querySelectorAll('.tab-content');
+                tabBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        tabBtns.forEach(b => b.classList.remove('active'));
+                        tabContents.forEach(c => c.style.display = 'none');
+                        
+                        btn.classList.add('active');
+                        const targetId = btn.getAttribute('data-target');
+                        if (targetId) {
+                            const target = document.getElementById(targetId);
+                            if (target) {
+                                target.style.display = 'block';
+                                if (targetId === 'tab-desc') target.classList.add('active');
+                            }
+                        }
+                    });
+                });
+
+                // Tự động kích hoạt tab nếu có tham số trên URL (ví dụ: ?tab=reviews sau khi đăng nhập thành công)
+                const urlParams = new URLSearchParams(window.location.search);
+                const tabParam = urlParams.get('tab');
+                if (tabParam === 'reviews') {
+                    const reviewsBtn = document.getElementById('tab-btn-reviews');
+                    if (reviewsBtn) {
+                        reviewsBtn.click();
+                    }
+                }
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = '<div style="grid-column: span 2; text-align: center; padding: 100px;"><h2>Lỗi tải dữ liệu</h2><p>Vui lòng thử lại sau.</p></div>';
+            }
+        }
+
+        // Helper to update product average rating and count on page real-time
+        async function updateProductStats() {
+            if (!currentProduct) return;
+            try {
+                const pRes = await fetch(`/api/products/${currentProduct.id}`);
+                const updatedProduct = await pRes.json();
+                if (updatedProduct) {
+                    currentProduct = updatedProduct;
+                    
+                    // Cập nhật số lượng trên nút Tab
+                    const reviewBtn = document.getElementById('tab-btn-reviews');
+                    if (reviewBtn) {
+                        reviewBtn.textContent = `Đánh giá (${updatedProduct.review_count || 0})`;
+                    }
+                    
+                    // Cập nhật số sao và điểm số ở phần thông tin chi tiết sản phẩm
+                    const ratingContainer = document.querySelector('.detail-rating');
+                    if (ratingContainer) {
+                        ratingContainer.innerHTML = `
+                            <div class="stars">
+                                <i data-lucide="star" style="fill: ${updatedProduct.average_rating >= 1 ? 'currentColor' : 'none'}; width: 16px; height: 16px; color: #f59e0b;"></i>
+                                <i data-lucide="star" style="fill: ${updatedProduct.average_rating >= 2 ? 'currentColor' : 'none'}; width: 16px; height: 16px; color: #f59e0b;"></i>
+                                <i data-lucide="star" style="fill: ${updatedProduct.average_rating >= 3 ? 'currentColor' : 'none'}; width: 16px; height: 16px; color: #f59e0b;"></i>
+                                <i data-lucide="star" style="fill: ${updatedProduct.average_rating >= 4 ? 'currentColor' : 'none'}; width: 16px; height: 16px; color: #f59e0b;"></i>
+                                <i data-lucide="star" style="fill: ${updatedProduct.average_rating >= 5 ? 'currentColor' : 'none'}; width: 16px; height: 16px; color: #f59e0b;"></i>
+                            </div>
+                            <span>${updatedProduct.average_rating || 0} (${updatedProduct.review_count || 0} đánh giá)</span>
+                        `;
+                        if (window.lucide) {
+                            lucide.createIcons();
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('Lỗi khi cập nhật thống kê sản phẩm:', err);
+            }
+        }
+
+        async function loadReviews(productId) {
+            const list = document.getElementById('reviews-list');
+            try {
+                const res = await fetch(`/api/products/${productId}/reviews`);
+                const reviews = await res.json();
+                
+                // Lấy tên khách hàng hiện tại đang đăng nhập
+                const userStr = localStorage.getItem('customer') || localStorage.getItem('user');
+                let currentUsername = '';
+                if (userStr) {
+                    try {
+                        const user = JSON.parse(userStr);
+                        currentUsername = user.name || user.fullname || user.username || user.email || '';
+                    } catch (e) {}
+                }
+                
+                if (reviews.length === 0) {
+                    list.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--on-surface-variant);">
+                        <i data-lucide="message-square" style="width: 48px; height: 48px; opacity: 0.5; margin-bottom: 12px;"></i>
+                        <p>Chưa có đánh giá nào cho sản phẩm này. Hãy là người đầu tiên!</p>
+                    </div>`;
+                } else {
+                    list.innerHTML = reviews.map(r => {
+                        const initial = r.customer_name ? r.customer_name.charAt(0).toUpperCase() : 'U';
+                        
+                        // Kiểm tra xem đây có phải bình luận của chính khách hàng này không
+                        const isOwnReview = currentUsername && r.customer_name === currentUsername;
+                        const actionButtons = isOwnReview ? `
+                            <div style="display: flex; gap: 12px; margin-top: 12px; border-top: 1px dashed var(--outline-variant); padding-top: 10px; justify-content: flex-end;">
+                                <button onclick="editReview('${r._id}', ${r.rating}, '${r.comment.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')" style="display: flex; align-items: center; gap: 4px; border: none; background: transparent; color: var(--primary); font-size: 12px; font-weight: 600; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;"><i data-lucide="edit-2" style="width: 13px; height: 13px;"></i> Sửa</button>
+                                <button onclick="deleteReview('${r._id}')" style="display: flex; align-items: center; gap: 4px; border: none; background: transparent; color: #ef4444; font-size: 12px; font-weight: 600; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;"><i data-lucide="trash-2" style="width: 13px; height: 13px;"></i> Xóa</button>
+                            </div>
+                        ` : '';
+
+                        return `
+                        <div class="review-item">
+                            <div class="review-header">
+                                <div class="review-author">
+                                    <div class="review-avatar">${initial}</div>
+                                    ${r.customer_name}
+                                </div>
+                                <span class="review-date">${new Date(r.created_at).toLocaleDateString('vi-VN')}</span>
+                            </div>
+                            <div class="review-stars">
+                                ${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}
+                            </div>
+                            <p class="review-text" style="white-space: pre-wrap; word-break: break-word;">${r.comment}</p>
+                            ${actionButtons}
+                        </div>
+                    `}).join('');
+                }
+                if (window.lucide) lucide.createIcons();
+            } catch (err) {
+                list.innerHTML = '<p>Lỗi tải đánh giá.</p>';
+            }
+        }
+
+        function editReview(reviewId, rating, comment) {
+            editingReviewId = reviewId;
+            document.getElementById('review-rating').value = rating;
+            document.getElementById('review-comment').value = comment;
+            
+            // Thay đổi giao diện Form thành chế độ sửa
+            const formTitle = document.querySelector('.review-form-container h4');
+            if (formTitle) formTitle.textContent = 'Chỉnh sửa đánh giá';
+            
+            const submitBtn = document.querySelector('#review-form button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.textContent = 'Cập nhật Đánh Giá';
+                submitBtn.style.background = '#059669'; // Emerald green
+            }
+            
+            // Thêm nút hủy sửa nếu chưa có
+            let cancelBtn = document.getElementById('btn-cancel-edit');
+            if (!cancelBtn) {
+                cancelBtn = document.createElement('button');
+                cancelBtn.type = 'button';
+                cancelBtn.id = 'btn-cancel-edit';
+                cancelBtn.textContent = 'Hủy bỏ';
+                cancelBtn.style.cssText = 'width: auto; min-width: 100px; padding: 12px 24px; border-radius: 8px; border: 1.5px solid var(--outline-variant); font-weight: 600; font-size: 1rem; cursor: pointer; margin-left: 12px; background: transparent; color: var(--on-surface-variant); transition: all 0.2s;';
+                cancelBtn.onclick = exitEditMode;
+                submitBtn.parentNode.appendChild(cancelBtn);
+            }
+            
+            // Cuộn mượt đến form
+            document.querySelector('.review-form-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function exitEditMode() {
+            editingReviewId = null;
+            document.getElementById('review-form').reset();
+            prefillUserName();
+            
+            const formTitle = document.querySelector('.review-form-container h4');
+            if (formTitle) formTitle.textContent = 'Gửi đánh giá của bạn';
+            
+            const submitBtn = document.querySelector('#review-form button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.textContent = 'Gửi Đánh Giá';
+                submitBtn.style.background = ''; // reset color
+            }
+            
+            const cancelBtn = document.getElementById('btn-cancel-edit');
+            if (cancelBtn) cancelBtn.remove();
+        }
+
+        function checkReviewAuth() {
+            const formContainer = document.querySelector('.review-form-container');
+            if (!formContainer) return;
+
+            const userStr = localStorage.getItem('customer') || localStorage.getItem('user');
+            if (!userStr) {
+                // Not logged in -> Show elegant E-commerce login CTA
+                formContainer.innerHTML = `
+                    <h4 style="margin-bottom: 20px; font-size: 1.2rem; font-weight: 700; color: var(--on-surface);">Gửi đánh giá của bạn</h4>
+                    <div class="review-login-prompt" style="text-align: center; padding: 32px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px; background: white; border: 1px solid var(--outline-variant); border-radius: 12px; box-shadow: var(--shadow-sm);">
+                        <div style="width: 56px; height: 56px; background: #eff6ff; color: #004ac6; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #dbeafe;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <h5 style="font-size: 14.5px; font-weight: 700; color: var(--on-surface); margin: 0;">Đăng nhập để đánh giá</h5>
+                        <p style="font-size: 13px; color: var(--on-surface-variant); max-width: 240px; margin: 0; line-height: 1.6;">Chỉ khách hàng đã đăng nhập tài khoản mới có thể gửi nhận xét và đánh giá sao cho sản phẩm.</p>
+                        <button onclick="showLoginRequiredDialog(window.location.pathname + '?tab=reviews')" class="btn-primary" style="padding: 10px 24px; border-radius: 8px; font-weight: 600; font-size: 13.5px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; background: #004ac6; color: white;">
+                            Đăng nhập ngay
+                        </button>
+                    </div>
+                `;
+            } else {
+                // Logged in -> Make sure form is presented with name readonly
+                let form = document.getElementById('review-form');
+                if (!form) {
+                    formContainer.innerHTML = `
+                        <h4 style="margin-bottom: 20px; font-size: 1.2rem; font-weight: 700; color: var(--on-surface);">Gửi đánh giá của bạn</h4>
+                        <form id="review-form" onsubmit="submitReview(event)">
+                            <div class="mb-3">
+                                <label>Tên của bạn</label>
+                                <input type="text" id="review-name" class="form-control" readonly style="background: #f1f5f9; cursor: not-allowed; font-weight: 600; color: #475569;" placeholder="Đang tải tên...">
+                            </div>
+                            <div class="mb-3">
+                                <label>Đánh giá (1-5 sao)</label>
+                                <select id="review-rating" class="form-control" required>
+                                    <option value="5">5 Sao - Tuyệt vời</option>
+                                    <option value="4">4 Sao - Tốt</option>
+                                    <option value="3">3 Sao - Bình thường</option>
+                                    <option value="2">2 Sao - Kém</option>
+                                    <option value="1">1 Sao - Tệ</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label>Nhận xét</label>
+                                <textarea id="review-comment" class="form-control" rows="4" required placeholder="Nhập cảm nhận của bạn về sản phẩm..."></textarea>
+                            </div>
+                            <div style="display: flex; justify-content: center; width: 100%; margin-top: 16px;">
+                                <button type="submit" class="btn-primary" style="display: inline-flex; align-items: center; justify-content: center; text-align: center; width: auto; min-width: 180px; padding: 12px 24px; border-radius: 8px; border: none; font-weight: 600; font-size: 1rem; cursor: pointer; background: #004ac6; color: white;">Gửi Đánh Giá</button>
+                            </div>
+                        </form>
+                    `;
+                } else {
+                    const nameInput = document.getElementById('review-name');
+                    if (nameInput) {
+                        nameInput.readOnly = true;
+                        nameInput.style.background = '#f1f5f9';
+                        nameInput.style.cursor = 'not-allowed';
+                        nameInput.style.fontWeight = '600';
+                        nameInput.style.color = '#475569';
+                    }
+                }
+                prefillUserName();
+            }
+        }
+
+        function prefillUserName() {
+            const nameInput = document.getElementById('review-name');
+            if (nameInput) {
+                const userStr = localStorage.getItem('customer') || localStorage.getItem('user');
+                if (userStr) {
+                    try {
+                        const user = JSON.parse(userStr);
+                        nameInput.value = user.name || user.fullname || user.username || user.email || '';
+                    } catch (e) {}
+                }
+            }
+        }
+
+        async function deleteReview(reviewId) {
+            const userStr = localStorage.getItem('customer') || localStorage.getItem('user');
+            if (!userStr) {
+                showLoginRequiredDialog();
+                return;
+            }
+            let user = JSON.parse(userStr);
+            if (!currentProduct) return;
+            const consent = await confirm('Bạn có chắc chắn muốn xóa đánh giá này không? Hành động này không thể hoàn tác.');
+            if (!consent) return;
+            
+            try {
+                const res = await fetch(`/api/products/${currentProduct.id}/reviews/${reviewId}`, {
+                    method: 'DELETE',
+                    headers: { 'customer-id': user.id }
+                });
+                
+                if (res.ok) {
+                    alert('Đã xóa đánh giá thành công!');
+                    await loadReviews(currentProduct.id);
+                    await updateProductStats();
+                } else {
+                    alert('Không thể xóa đánh giá, vui lòng thử lại.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Lỗi hệ thống!');
+            }
+        }
+
+        async function submitReview(e) {
+            e.preventDefault();
+            if (!currentProduct) return;
+
+            const userStr = localStorage.getItem('customer') || localStorage.getItem('user');
+            if (!userStr) {
+                showLoginRequiredDialog();
+                return;
+            }
+            let user = JSON.parse(userStr);
+            
+            const btn = e.target.querySelector('button');
+            const originalText = btn.textContent;
+            btn.textContent = 'Đang gửi...';
+            btn.disabled = true;
+
+            const data = {
+                customer_id: user.id,
+                customer_name: document.getElementById('review-name').value,
+                rating: parseInt(document.getElementById('review-rating').value),
+                comment: document.getElementById('review-comment').value
+            };
+
+            try {
+                const url = editingReviewId 
+                    ? `/api/products/${currentProduct.id}/reviews/${editingReviewId}` 
+                    : `/api/products/${currentProduct.id}/reviews`;
+                const method = editingReviewId ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (res.ok) {
+                    alert(editingReviewId ? 'Đã cập nhật đánh giá thành công!' : 'Cảm ơn bạn đã gửi đánh giá!');
+                    exitEditMode();
+                    
+                    // Cập nhật real-time danh sách đánh giá không cần reload trang
+                    await loadReviews(currentProduct.id);
+                    await updateProductStats();
+                } else {
+                    alert('Có lỗi xảy ra, vui lòng thử lại.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Lỗi hệ thống!');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function updateQty(delta) {
+            const input = document.getElementById('detail-qty');
+            if (input) {
+                let val = parseInt(input.value) || 1;
+                val += delta;
+                if (val < 1) val = 1;
+                input.value = val;
+            }
+        }
+
+        function handleAddToCart() {
+            if (!currentProduct) return;
+            const qty = parseInt(document.getElementById('detail-qty').value) || 1;
+            const firstImage = currentProduct.images && currentProduct.images.length > 0 ? currentProduct.images[0] : null;
+            
+            for(let i = 0; i < qty; i++) {
+                addToCart({
+                    id: currentProduct.id,
+                    name: currentProduct.name,
+                    price: currentProduct.selling_price,
+                    image: firstImage
+                });
+            }
+        }
+
+        function buyNow() {
+            handleAddToCart();
+            window.location.href = '/cart';
+        }
+
+        // Enforce Authentication Check & Pre-fill Name on Document Ready
+        document.addEventListener('DOMContentLoaded', () => {
+            checkReviewAuth();
+        });
+    </script>
+    <script src="/js/ai-chatbox.js"></script>
+</body>
+</html>

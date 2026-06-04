@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - ThuyR Mart</title>
+    <link rel="stylesheet" href="/css/customer.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0; padding: 0;">
+    <div class="auth-wrapper">
+        <!-- Sidebar Image -->
+        <aside class="auth-aside" style="background-image: url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=2070');">
+            <div class="auth-aside-content">
+                <h2>Tham gia cùng chúng tôi.</h2>
+                <p>Khởi đầu hành trình tối ưu hóa không gian làm việc của bạn.</p>
+            </div>
+        </aside>
+
+        <!-- Main Register Form -->
+        <main class="auth-main">
+            <a href="/" class="auth-logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                <span style="color: var(--on-surface);">ThuyR Mart</span>
+            </a>
+
+            <div class="auth-form-container">
+                <h1 class="auth-title">Đăng ký tài khoản</h1>
+                <p class="auth-subtitle">Tạo tài khoản mới để bắt đầu sử dụng hệ thống.</p>
+
+                <form id="register-form">
+                    <div class="auth-form-group">
+                        <label class="auth-form-label">Họ và tên</label>
+                        <input type="text" id="fullname" class="auth-form-input" placeholder="Nhập họ và tên của bạn" required>
+                    </div>
+
+                    <div class="auth-form-group">
+                        <label class="auth-form-label">Số điện thoại</label>
+                        <input type="tel" id="phone" class="auth-form-input" placeholder="ví dụ: 0399501846" required>
+                    </div>
+
+                    <div class="auth-form-group">
+                        <label class="auth-form-label">Mật khẩu</label>
+                        <input type="password" id="password" class="auth-form-input" placeholder="Tối thiểu 8 ký tự" required minlength="8">
+                    </div>
+
+                    <div class="auth-form-group">
+                        <label class="auth-form-label">Xác nhận mật khẩu</label>
+                        <input type="password" id="confirm-password" class="auth-form-input" placeholder="Nhập lại mật khẩu" required minlength="8">
+                    </div>
+
+                    <div class="auth-checkbox-group">
+                        <input type="checkbox" id="terms" required>
+                        <label for="terms">
+                            Tôi đồng ý với các <a href="#">Điều khoản dịch vụ</a> và <a href="#">Chính sách bảo mật</a>.
+                        </label>
+                    </div>
+
+                    <button type="submit" class="auth-btn">Đăng ký</button>
+
+                    <div class="auth-footer">
+                        Đã có tài khoản? <a href="/login">Đăng nhập</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/customer.js"></script>
+    <script>
+        lucide.createIcons();
+        
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fullname = document.getElementById('fullname').value;
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (password !== confirmPassword) {
+                alert('Mật khẩu xác nhận không khớp!');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/customers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: fullname, phone: phone, password: password })
+                });
+                
+                if (res.ok) {
+                    alert('Đăng ký thành công! Vui lòng đăng nhập.');
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirectUrl = urlParams.get('redirect');
+                    window.location.href = redirectUrl ? '/login?redirect=' + encodeURIComponent(redirectUrl) : '/login';
+                } else {
+                    const data = await res.json();
+                    alert('Đăng ký thất bại: ' + (data.error || 'Vui lòng thử lại.'));
+                }
+            } catch (err) {
+                console.error('Register error:', err);
+                alert('Không thể kết nối đến máy chủ.');
+            }
+        });
+    </script>
+    <script src="/js/ai-chatbox.js"></script>
+</body>
+</html>

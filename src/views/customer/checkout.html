@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin giao hàng - ThuyR Mart</title>
+    <link rel="stylesheet" href="/css/customer.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0; padding: 0; background: var(--surface-bright);">
+    <script>
+        if (!localStorage.getItem('customer') && !localStorage.getItem('user')) {
+            alert('Vui lòng đăng nhập trước khi tiến hành thanh toán.');
+            window.location.href = '/login?redirect=/checkout';
+        }
+    </script>
+    <!-- Simple Header -->
+    <header class="checkout-header">
+        <div class="container">
+            <a href="/" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                <span style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 20px; color: var(--primary);">ThuyR <span style="color: #059669; font-size: 16px;">Mart</span></span>
+            </a>
+            <a href="/cart" class="checkout-back">
+                <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i> Quay lại
+            </a>
+        </div>
+    </header>
+
+    <main class="container checkout-layout">
+        <!-- Main Form Column -->
+        <div>
+            <!-- Stepper -->
+            <div class="stepper">
+                <div class="step-container">
+                    <div class="step completed"><i data-lucide="check" style="width: 16px; height: 16px;"></i></div>
+                    <div class="step-label" style="color: var(--primary);">Giỏ hàng</div>
+                </div>
+                <div class="step-line completed"></div>
+                
+                <div class="step-container active">
+                    <div class="step active">2</div>
+                    <div class="step-label">Thông tin</div>
+                </div>
+                <div class="step-line"></div>
+                
+                <div class="step-container">
+                    <div class="step">3</div>
+                    <div class="step-label">Thanh toán</div>
+                </div>
+            </div>
+
+            <!-- Shipping Form -->
+            <div class="account-card">
+                <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--on-surface);">Thông tin giao hàng</h2>
+                
+                <form id="checkout-form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                        <div>
+                            <label class="auth-form-label">Họ và tên</label>
+                            <input type="text" id="fullname" class="auth-form-input" placeholder="Nhập họ và tên" required>
+                        </div>
+                        <div>
+                            <label class="auth-form-label">Số điện thoại</label>
+                            <input type="tel" id="phone" class="auth-form-input" placeholder="Nhập số điện thoại" required>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 24px;">
+                        <label class="auth-form-label">Địa chỉ chi tiết</label>
+                        <input type="text" id="address" class="auth-form-input" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố" required>
+                    </div>
+                    
+                    <div>
+                        <label class="auth-form-label">Ghi chú đơn hàng (Tùy chọn)</label>
+                        <textarea id="note" class="auth-form-input" placeholder="Ghi chú thêm về đơn hàng..." style="min-height: 120px; resize: vertical; margin-bottom: 24px;"></textarea>
+                    </div>
+
+                    <div style="margin-bottom: 24px;">
+                        <label class="auth-form-label">Phương thức thanh toán</label>
+                        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--on-surface);">
+                                <input type="radio" name="payment_method" value="cash" checked onchange="toggleTransferInfo(false)" style="accent-color: var(--primary); width: 18px; height: 18px;">
+                                <span>Thanh toán khi nhận hàng (COD)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--on-surface);">
+                                <input type="radio" name="payment_method" value="transfer" onchange="toggleTransferInfo(true)" style="accent-color: var(--primary); width: 18px; height: 18px;">
+                                <span>Chuyển khoản trực tuyến</span>
+                            </label>
+                        </div>
+                        <div id="transfer-info" style="display: none; margin-top: 16px; padding: 16px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0; font-size: 14px;">
+                            <div style="display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 200px;">
+                                    <p style="margin-bottom: 8px; color: #166534;"><strong>Thông tin chuyển khoản:</strong></p>
+                                    <p style="margin-bottom: 4px; color: #15803d;">Ngân hàng: <strong>Vietinbank</strong></p>
+                                    <p style="margin-bottom: 4px; color: #15803d;">Số tài khoản: <strong>103877087416</strong></p>
+                                    <p style="margin-bottom: 4px; color: #15803d;">Chủ tài khoản: <strong>Do Thi Thuy</strong></p>
+                                    <p style="margin-bottom: 0; color: #15803d;">Số tiền: <strong id="transfer-amount" style="font-size: 15px; color: var(--primary);">0đ</strong></p>
+                                    <p style="margin-top: 8px; color: #166534; font-size: 13px;"><em>Hệ thống sẽ ghi nhận đã thanh toán trước khi giao hàng.</em></p>
+                                </div>
+                                <div style="text-align: center; background: white; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); flex-shrink: 0;">
+                                    <img id="transfer-qr" src="" alt="Mã QR Thanh toán" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Summary Column -->
+        <aside>
+            <div class="summary-card">
+                <h3 class="summary-title">Tóm tắt đơn hàng</h3>
+                
+                <div id="order-items-list">
+                    <!-- Dynamic Items List -->
+                </div>
+
+                <div class="summary-row" style="margin-top: 16px;">
+                    <span style="color: var(--on-surface-variant);">Tạm tính</span>
+                    <span id="subtotal" style="font-weight: 600; color: var(--on-surface);">0đ</span>
+                </div>
+                <div class="summary-row">
+                    <span style="color: var(--on-surface-variant);">Phí vận chuyển</span>
+                    <span style="color: var(--on-surface);">Tính ở bước sau</span>
+                </div>
+                
+                <div class="summary-row total">
+                    <span>Tổng cộng</span>
+                    <span id="total">0đ</span>
+                </div>
+
+                <button type="button" onclick="placeOrder()" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px;">
+                    Tiếp tục <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                </button>
+                
+                <div class="secure-checkout">
+                    <i data-lucide="lock" style="width: 14px; height: 14px;"></i> Thanh toán bảo mật 100%
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script src="/js/customer.js"></script>
+    <script>
+        lucide.createIcons();
+
+        function toggleTransferInfo(show) {
+            const infoDiv = document.getElementById('transfer-info');
+            if (show) {
+                infoDiv.style.display = 'block';
+                const subtotal = window.orderSubtotal || 0;
+                const formatVND = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
+                
+                document.getElementById('transfer-amount').textContent = formatVND(subtotal);
+                
+                const accountNo = "103877087416";
+                const accountName = encodeURIComponent("Do Thi Thuy");
+                const description = encodeURIComponent("ThuyRMart CK mua hang");
+                const qrUrl = `https://img.vietqr.io/image/vietinbank-${accountNo}-qr_only.png?amount=${subtotal}&addInfo=${description}&accountName=${accountName}`;
+                
+                document.getElementById('transfer-qr').src = qrUrl;
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Pre-fill user data if logged in
+            const customerStr = localStorage.getItem('customer') || localStorage.getItem('user');
+            if (customerStr) {
+                try {
+                    const customer = JSON.parse(customerStr);
+                    if (customer.name || customer.fullname) document.getElementById('fullname').value = customer.name || customer.fullname;
+                    if (customer.phone) document.getElementById('phone').value = customer.phone;
+                    if (customer.address) document.getElementById('address').value = customer.address;
+                } catch (e) {
+                    console.error('Error parsing customer data', e);
+                }
+            }
+
+            // Pre-fill from address book if available (overrides basic customer info)
+            const addrsStr = localStorage.getItem('addresses_' + (JSON.parse(localStorage.getItem('customer') || '{}').phone || 'guest'));
+            if (addrsStr) {
+                try {
+                    const addrs = JSON.parse(addrsStr);
+                    if (addrs.length > 0) {
+                        const defaultAddr = addrs.find(a => a.isDefault) || addrs[0];
+                        document.getElementById('fullname').value = defaultAddr.name;
+                        document.getElementById('phone').value = defaultAddr.phone;
+                        document.getElementById('address').value = defaultAddr.detail + ', ' + defaultAddr.region;
+                    }
+                } catch (e) {
+                    console.error('Error parsing address book', e);
+                }
+            }
+
+            const list = document.getElementById('order-items-list');
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            // Formatting helper for rendering
+            const formatVND = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
+
+            if (cart.length === 0) {
+                // Render dummy data if no cart, just to match screenshot design during development
+                list.innerHTML = `
+                    <div class="summary-item">
+                        <div class="summary-item-img">
+                            <i data-lucide="image" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <div class="summary-item-info">
+                            <div class="summary-item-title">Premium Desk Org...</div>
+                            <div class="summary-item-qty">Số lượng: 1</div>
+                        </div>
+                        <div class="summary-item-price">1.250.000đ</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-item-img">
+                            <i data-lucide="image" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <div class="summary-item-info">
+                            <div class="summary-item-title">Ergonomic Mouse</div>
+                            <div class="summary-item-qty">Số lượng: 1</div>
+                        </div>
+                        <div class="summary-item-price">850.000đ</div>
+                    </div>
+                `;
+                document.getElementById('subtotal').textContent = '2.100.000đ';
+                document.getElementById('total').textContent = '2.100.000đ';
+                window.orderSubtotal = 2100000;
+                lucide.createIcons(); // Re-init icons for dynamic content
+                return;
+            }
+
+            list.innerHTML = cart.map(item => {
+                const imageHtml = item.image 
+                    ? `<img src="${item.image}" class="summary-item-img" style="object-fit: cover;">`
+                    : `<div class="summary-item-img"><i data-lucide="image" style="width: 24px; height: 24px;"></i></div>`;
+
+                return `
+                    <div class="summary-item">
+                        ${imageHtml}
+                        <div class="summary-item-info">
+                            <div class="summary-item-title">${item.name}</div>
+                            <div class="summary-item-qty">Số lượng: ${item.quantity}</div>
+                        </div>
+                        <div class="summary-item-price">${formatVND(item.price * item.quantity)}</div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('subtotal').textContent = formatVND(subtotal);
+            document.getElementById('total').textContent = formatVND(subtotal);
+            window.orderSubtotal = subtotal;
+        });
+
+        async function placeOrder() {
+            const fullname = document.getElementById('fullname').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            const note = document.getElementById('note').value;
+
+            if(!fullname || !phone || !address) {
+                alert('Vui lòng điền đầy đủ thông tin giao hàng.');
+                return;
+            }
+
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if(cart.length === 0) {
+                alert('Giỏ hàng trống! Đây chỉ là bản demo tĩnh do bạn chưa thêm gì vào giỏ.');
+                return;
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            try {
+                let customerId;
+                const loggedInCustomerStr = localStorage.getItem('customer') || localStorage.getItem('user');
+                let loggedInCustomer = null;
+                
+                if (loggedInCustomerStr) {
+                    try {
+                        loggedInCustomer = JSON.parse(loggedInCustomerStr);
+                    } catch(e) {}
+                }
+
+                if (loggedInCustomer && loggedInCustomer.id) {
+                    customerId = loggedInCustomer.id;
+                } else {
+                    // 1. Find or Create Customer if not logged in
+                    const customerRes = await fetch('/api/customers/find-or-create', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: fullname, phone, address })
+                    });
+                    const customer = await customerRes.json();
+                    customerId = customer.id;
+                }
+
+                // 2. Place Order
+                const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+                const paidAmount = 0;
+
+                const res = await fetch('/api/sales/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order: {
+                            customer_id: customerId,
+                            total_amount: subtotal,
+                            final_amount: subtotal,
+                            paid_amount: paidAmount,
+                            payment_method: paymentMethod,
+                            status: 'pending',
+                            note: note
+                        },
+                        items: cart
+                    })
+                });
+
+                const result = await res.json();
+                if (result.success) {
+                    localStorage.removeItem('cart');
+                    window.location.href = `/order-success?id=${result.saleId}`;
+                } else {
+                    alert('Lỗi đặt hàng: ' + result.error);
+                }
+            } catch (err) {
+                console.error('Checkout error:', err);
+                alert('Không thể kết nối đến máy chủ.');
+            }
+        }
+    </script>
+    <script src="/js/ai-chatbox.js"></script>
+</body>
+</html>

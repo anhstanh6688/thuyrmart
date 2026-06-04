@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ cá nhân - ThuyR Mart</title>
+    <link rel="stylesheet" href="/css/customer.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0; padding: 0; background: var(--surface-bright);">
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                <span style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 20px; color: var(--primary);">ThuyR <span style="color: #059669; font-size: 16px;">Mart</span></span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+            <div class="header-actions">
+                <button class="action-btn" aria-label="Notifications"><i data-lucide="bell"></i></button>
+                <a href="/cart" class="action-btn" aria-label="Cart"><i data-lucide="shopping-cart"></i></a>
+                <a href="/account" class="action-btn" style="display: flex; align-items: center; gap: 8px; border-left: 1px solid var(--outline-variant); padding-left: 20px; text-decoration: none;">
+                    <span style="font-size: 14px; font-weight: 600; color: var(--primary);">Account</span>
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=150" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="account-page">
+        <div class="container">
+            <div class="account-layout">
+                <!-- Sidebar -->
+                <aside class="account-sidebar">
+                    <div style="margin-bottom: 24px;">
+                        <h2 style="font-size: 18px; font-weight: 700; color: var(--on-surface); margin-bottom: 4px;">Tài khoản của tôi</h2>
+                        <p style="font-size: 13px; color: var(--on-surface-variant);">Quản lý thông tin và đơn hàng</p>
+                    </div>
+                    <div class="account-nav-divider" style="margin-bottom: 24px;"></div>
+                    
+                    <ul class="account-nav">
+                        <li class="account-nav-item">
+                            <a href="/account" class="account-nav-link active">
+                                <i data-lucide="user" style="width: 18px; height: 18px;"></i> Hồ sơ cá nhân
+                            </a>
+                        </li>
+                        <li class="account-nav-item">
+                            <a href="/account-orders" class="account-nav-link">
+                                <i data-lucide="file-text" style="width: 18px; height: 18px;"></i> Đơn hàng của tôi
+                            </a>
+                        </li>
+                        <li class="account-nav-item">
+                            <a href="/account-addresses" class="account-nav-link">
+                                <i data-lucide="map-pin" style="width: 18px; height: 18px;"></i> Sổ địa chỉ
+                            </a>
+                        </li>
+                        <li class="account-nav-item">
+                            <a href="/account-wishlist" class="account-nav-link">
+                                <i data-lucide="heart" style="width: 18px; height: 18px;"></i> Sản phẩm yêu thích
+                            </a>
+                        </li>
+                        
+                        <div class="account-nav-divider" style="margin-top: 24px; margin-bottom: 24px;"></div>
+                        
+                        <li class="account-nav-item">
+                            <a href="#" class="account-nav-link" id="logout-btn">
+                                <i data-lucide="log-out" style="width: 18px; height: 18px;"></i> Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </aside>
+
+                <!-- Profile Form -->
+                <section>
+                    <div class="account-header">
+                        <h1 class="account-title">Hồ sơ cá nhân</h1>
+                        <p class="account-subtitle">Quản lý thông tin bảo mật và cài đặt tài khoản.</p>
+                    </div>
+
+                    <div class="account-card">
+                        <!-- Avatar Section -->
+                        <div class="avatar-section">
+                            <img id="avatar-img" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=250" alt="Profile" class="avatar-image">
+                            <div class="avatar-actions">
+                                <div class="avatar-buttons">
+                                    <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+                                    <button class="btn-outline" onclick="document.getElementById('avatar-input').click()">Tải ảnh mới</button>
+                                    <button class="btn-ghost" onclick="removeAvatar()">Xóa ảnh</button>
+                                </div>
+                                <span class="avatar-helper">Định dạng JPEG, PNG hoặc GIF. Dung lượng tối đa 5MB.</span>
+                            </div>
+                        </div>
+
+                        <div class="account-divider"></div>
+
+                        <!-- Form Fields -->
+                        <form id="profile-form">
+                            <div class="account-form-grid">
+                                <div>
+                                    <label class="auth-form-label">Họ và tên</label>
+                                    <input type="text" id="fullname" class="auth-form-input" value="">
+                                </div>
+                                <div>
+                                    <label class="auth-form-label">Địa chỉ Email</label>
+                                    <input type="email" id="email" class="auth-form-input" value="">
+                                </div>
+                                <div>
+                                    <label class="auth-form-label">Số điện thoại</label>
+                                    <input type="text" id="phone" class="auth-form-input" value="">
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: flex-end;">
+                                <button type="submit" class="btn-primary" style="padding: 12px 24px;">Lưu thay đổi</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+            <footer class="footer" style="background-color: var(--surface-container); border-top: 1px solid var(--outline-variant); padding: 60px 0 20px;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                <!-- Company Info -->
+                <div>
+                    <a href="/" class="footer-logo" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 20px;">
+                        <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                        <span style="font-size: 1.5rem; font-weight: 800; color: var(--on-surface); font-family: 'Manrope', sans-serif;">ThuyR Mart</span>
+                    </a>
+                    <p style="color: var(--on-surface-variant); line-height: 1.6; font-size: 0.95rem; margin-bottom: 20px;">
+                        Hệ thống bán lẻ ThuyR Mart cam kết mang đến cho bạn những sản phẩm chất lượng nhất với giá cả hợp lý và dịch vụ tận tâm.
+                    </p>
+                    <div style="display: flex; gap: 16px;">
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="facebook" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="instagram" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="youtube" style="width: 20px; height: 20px;"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Liên kết nhanh</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="/" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Trang chủ</a></li>
+                        <li><a href="/products" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Sản phẩm</a></li>
+                        <li><a href="/about" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Về chúng tôi</a></li>
+                        <li><a href="/contact" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Liên hệ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Customer Support -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Hỗ trợ khách hàng</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách bảo mật</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Điều khoản dịch vụ</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách đổi trả</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Hướng dẫn mua hàng</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Thông tin liên hệ</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px;">
+                        <li style="display: flex; align-items: flex-start; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="map-pin" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>123 Đường Bách Khoa, Quận Hai Bà Trưng, Hà Nội</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="phone" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>0399.501.846</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="mail" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>support@thuyrmart.vn</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div style="border-top: 1px solid var(--outline-variant); padding-top: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                <p style="font-size: 0.9rem; color: var(--on-surface-variant); margin: 0;">
+                    &copy; 2026 ThuyR Mart. All rights reserved.
+                </p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <i data-lucide="credit-card" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="wallet" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="banknote" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Basic Profile Logic from existing codebase
+        document.addEventListener('DOMContentLoaded', () => {
+            const customerStr = localStorage.getItem('customer');
+            if (customerStr) {
+                try {
+                    const customer = JSON.parse(customerStr);
+                    // Populate fields if we have real data, otherwise keep placeholders
+                    if(customer.name) document.getElementById('fullname').value = customer.name;
+                    if(customer.email) document.getElementById('email').value = customer.email;
+                    if(customer.phone) document.getElementById('phone').value = customer.phone;
+                    if(customer.avatar) document.getElementById('avatar-img').src = customer.avatar;
+                } catch(e) {
+                    console.error("Lỗi đọc dữ liệu user", e);
+                }
+            }
+
+            // Avatar logic
+            const avatarInput = document.getElementById('avatar-input');
+            avatarInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Dung lượng ảnh vượt quá 5MB');
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const base64Str = event.target.result;
+                        document.getElementById('avatar-img').src = base64Str;
+                        const headerAvatar = document.querySelector('.header-actions img');
+                        if (headerAvatar) headerAvatar.src = base64Str;
+                        
+                        if (customerStr) {
+                            try {
+                                const customer = JSON.parse(customerStr);
+                                customer.avatar = base64Str;
+                                localStorage.setItem('customer', JSON.stringify(customer));
+                            } catch(err) {}
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            window.removeAvatar = function() {
+                const defaultAvatar = "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=250";
+                document.getElementById('avatar-img').src = defaultAvatar;
+                const headerAvatar = document.querySelector('.header-actions img');
+                if (headerAvatar) headerAvatar.src = defaultAvatar;
+                
+                if (customerStr) {
+                    try {
+                        const customer = JSON.parse(customerStr);
+                        customer.avatar = defaultAvatar;
+                        localStorage.setItem('customer', JSON.stringify(customer));
+                    } catch(err) {}
+                }
+            };
+
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('customer');
+                    localStorage.removeItem('user');
+                    window.location.href = '/';
+                });
+            }
+
+            // Save changes handling
+            const profileForm = document.getElementById('profile-form');
+            if (profileForm) {
+                profileForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!customerStr) {
+                        alert('Lỗi: Bạn chưa đăng nhập');
+                        return;
+                    }
+                    
+                    try {
+                        const customer = JSON.parse(customerStr);
+                        const fullname = document.getElementById('fullname').value.trim();
+                        const email = document.getElementById('email').value.trim();
+                        const phone = document.getElementById('phone').value.trim();
+                        const avatar = document.getElementById('avatar-img').src;
+                        
+                        if (!fullname || !phone) {
+                            alert('Vui lòng điền đầy đủ Họ tên và Số điện thoại');
+                            return;
+                        }
+                        
+                        const updatedData = {
+                            name: fullname,
+                            email: email,
+                            phone: phone,
+                            avatar: avatar
+                        };
+                        
+                        const res = await fetch(`/api/customers/${customer.id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updatedData)
+                        });
+                        
+                        const data = await res.json();
+                        
+                        if (res.ok) {
+                            // Cập nhật thông tin trong LocalStorage
+                            customer.name = fullname;
+                            customer.email = email;
+                            customer.phone = phone;
+                            customer.avatar = avatar;
+                            localStorage.setItem('customer', JSON.stringify(customer));
+                            
+                            // Đồng bộ với khóa 'user' dùng chung
+                            const userStr = localStorage.getItem('user');
+                            if (userStr) {
+                                const userObj = JSON.parse(userStr);
+                                if (userObj.role === 'customer') {
+                                    userObj.name = fullname;
+                                    userObj.phone = phone;
+                                    userObj.avatar = avatar;
+                                    localStorage.setItem('user', JSON.stringify(userObj));
+                                }
+                            }
+                            
+                            // Cập nhật ảnh đại diện trên Header
+                            const headerAvatar = document.querySelector('.header-actions img');
+                            if (headerAvatar) headerAvatar.src = avatar;
+                            
+                            alert('Đã cập nhật thông tin thành công!');
+                        } else {
+                            alert('Lỗi: ' + (data.error || data.message || 'Không thể cập nhật'));
+                        }
+                    } catch (err) {
+                        console.error('Update profile error:', err);
+                        alert('Không thể kết nối đến máy chủ');
+                    }
+                });
+            }
+        });
+    </script>
+    <script src="/js/customer.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userStr = localStorage.getItem('customer');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    const headerAvatar = document.querySelector('.header-actions img');
+                    if (headerAvatar && user.avatar) {
+                        headerAvatar.src = user.avatar;
+                    }
+                } catch(e) {}
+            }
+        });
+    </script>
+    <script src="/js/ai-chatbox.js"></script>
+</body>
+</html>

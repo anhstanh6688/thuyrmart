@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đặt hàng thành công - ThuyR Mart</title>
+    <link rel="stylesheet" href="/css/customer.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: var(--surface-bright);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+      }
+      .success-card {
+        background: white;
+        border: 1px solid var(--outline-variant);
+        border-radius: 12px;
+        padding: 48px;
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+      }
+      .check-icon-wrapper {
+        width: 80px;
+        height: 80px;
+        background: #e6f9f0; /* Light green tint matching brand */
+        color: var(--tertiary); /* Dark green */
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+      }
+      .success-title {
+        font-size: 32px;
+        margin-bottom: 12px;
+        font-weight: 800;
+        color: var(--on-surface);
+        letter-spacing: -0.02em;
+      }
+      .success-subtitle {
+        color: var(--on-surface-variant);
+        line-height: 1.6;
+        max-width: 480px;
+        margin: 0 auto 40px;
+        font-size: 16px;
+      }
+      .success-subtitle strong {
+        color: var(--on-surface);
+        font-weight: 700;
+      }
+
+      .order-summary-box {
+        background: var(--surface-bright);
+        border-radius: 8px;
+        padding: 32px;
+        text-align: left;
+        margin-bottom: 40px;
+        border: 1px solid var(--outline-variant);
+      }
+      .order-summary-title {
+        margin-bottom: 24px;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--on-surface);
+      }
+
+      .success-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px dashed var(--outline-variant);
+      }
+      .success-item-img {
+        width: 56px;
+        height: 56px;
+        border-radius: 4px;
+        background: var(--surface-container-low);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        object-fit: cover;
+      }
+      .success-item-info {
+        flex: 1;
+      }
+      .success-item-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--on-surface);
+        margin-bottom: 4px;
+      }
+      .success-item-qty {
+        font-size: 13px;
+        color: var(--on-surface-variant);
+      }
+      .success-item-price {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--on-surface);
+      }
+
+      .summary-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 24px;
+        font-size: 16px;
+        color: var(--on-surface-variant);
+      }
+      .summary-total .total-amount {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--on-surface);
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+      }
+      .btn-success-primary {
+        background: var(--primary-container);
+        color: var(--on-primary);
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.2s;
+        border: 1px solid var(--primary-container);
+        font-size: 15px;
+      }
+      .btn-success-primary:hover {
+        background: var(--primary);
+        border-color: var(--primary);
+      }
+      .btn-success-outline {
+        background: transparent;
+        color: var(--primary);
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.2s;
+        border: 1px solid var(--primary);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+      }
+      .btn-success-outline:hover {
+        background: var(--surface-container-low);
+      }
+      .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #b45309;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="success-card">
+      <div class="check-icon-wrapper">
+        <i
+          data-lucide="check-circle"
+          style="width: 48px; height: 48px"
+          stroke-width="2.5"
+        ></i>
+      </div>
+
+      <h1 class="success-title">Đặt hàng thành công!</h1>
+      <p class="success-subtitle">
+        Cảm ơn bạn đã tin tưởng Ocean ThuyR Mart. Mã đơn hàng của bạn là
+        <strong id="order-id">#ORD-2024-8892</strong>.
+      </p>
+
+      <div
+        id="transfer-payment-box"
+        style="
+          display: none;
+          background: #fffbeb;
+          border: 1px solid #fef3c7;
+          border-radius: 8px;
+          padding: 24px;
+          text-align: left;
+          margin-bottom: 24px;
+          box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+        "
+      >
+        <div
+          style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap"
+        >
+          <div style="flex: 1; min-width: 260px">
+            <h4
+              style="
+                margin-bottom: 12px;
+                color: #b45309;
+                font-size: 16px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              "
+            >
+              <span id="payment-status-spinner" class="spinner"></span>
+              <i
+                id="payment-status-check"
+                data-lucide="check-circle"
+                style="display: none; width: 18px; height: 18px; color: #15803d"
+              ></i>
+              <span id="payment-status-text"
+                >Đang chờ khách hàng chuyển khoản...</span
+              >
+            </h4>
+            <p
+              style="
+                font-size: 13px;
+                color: #78350f;
+                line-height: 1.6;
+                margin-bottom: 16px;
+              "
+            >
+              Vui lòng quét mã QR chuyển khoản chính xác bên cạnh để hệ thống
+              nhận diện tự động và duyệt giao đơn hàng ngay!
+            </p>
+            <div
+              style="
+                background: white;
+                padding: 12px;
+                border-radius: 6px;
+                border: 1px solid #fef3c7;
+                font-size: 13px;
+                margin-bottom: 16px;
+                color: #4b5563;
+              "
+            >
+              <div style="margin-bottom: 4px">
+                Ngân hàng: <strong>Vietinbank</strong>
+              </div>
+              <div style="margin-bottom: 4px">
+                Số tài khoản: <strong>103877087416</strong>
+              </div>
+              <div style="margin-bottom: 4px">
+                Chủ tài khoản: <strong>Do Thi Thuy</strong>
+              </div>
+              <div>
+                Số tiền:
+                <strong id="transfer-box-amount" style="color: var(--primary)"
+                  >0đ</strong
+                >
+              </div>
+            </div>
+            <button
+              id="btn-simulate-pay"
+              onclick="simulatePayment()"
+              class="btn-success-outline"
+              style="
+                width: 100%;
+                justify-content: center;
+                padding: 10px 16px;
+                font-size: 13px;
+                background: #b45309;
+                color: white;
+                border: none;
+                font-weight: 700;
+                cursor: pointer;
+                border-radius: 6px;
+              "
+            >
+              Giả lập đã quét QR & chuyển tiền thành công
+            </button>
+          </div>
+          <div
+            style="
+              text-align: center;
+              background: white;
+              padding: 12px;
+              border-radius: 8px;
+              border: 1px solid #f3f4f6;
+              width: 160px;
+              height: 160px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+              flex-shrink: 0;
+              margin: 0 auto;
+            "
+          >
+            <img
+              id="transfer-box-qr"
+              src=""
+              alt="Mã QR VietinBank"
+              style="max-width: 100%; max-height: 100%; object-fit: contain"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="order-summary-box">
+        <h4 class="order-summary-title">Tóm tắt đơn hàng</h4>
+
+        <div id="summary-items">
+          <!-- Static Demo Data based on screenshot -->
+          <div class="success-item">
+            <div class="success-item-img">
+              <i data-lucide="image" style="width: 24px; height: 24px"></i>
+            </div>
+            <div class="success-item-info">
+              <div class="success-item-title">
+                Tài liệu phân tích chiến lược Q3
+              </div>
+              <div class="success-item-qty">Số lượng: 1</div>
+            </div>
+            <div class="success-item-price">$299.00</div>
+          </div>
+          <div
+            class="success-item"
+            style="border-bottom: none; padding-bottom: 0"
+          >
+            <div class="success-item-img">
+              <i data-lucide="image" style="width: 24px; height: 24px"></i>
+            </div>
+            <div class="success-item-info">
+              <div class="success-item-title">Gói tư vấn Premium (1 giờ)</div>
+              <div class="success-item-qty">Số lượng: 1</div>
+            </div>
+            <div class="success-item-price">$500.00</div>
+          </div>
+        </div>
+
+        <div
+          style="
+            height: 1px;
+            background: var(--outline-variant);
+            margin-top: 24px;
+          "
+        ></div>
+
+        <div class="summary-total">
+          <span>Tổng cộng</span>
+          <span class="total-amount" id="order-total">$799.00</span>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <a href="/" class="btn-success-primary">Về trang chủ</a>
+        <a href="/account-orders" class="btn-success-outline">
+          Xem đơn hàng
+          <i data-lucide="arrow-right" style="width: 16px; height: 16px"></i>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      lucide.createIcons();
+
+      function showPaidState() {
+        document.getElementById("payment-status-spinner").style.display =
+          "none";
+        const checkIcon = document.getElementById("payment-status-check");
+        if (checkIcon) checkIcon.style.display = "inline-block";
+        document.getElementById("payment-status-text").textContent =
+          " Đã nhận được tiền thanh toán!";
+        const payBox = document.getElementById("transfer-payment-box");
+        payBox.style.background = "#f0fdf4";
+        payBox.style.borderColor = "#bbf7d0";
+        const desc = payBox.querySelector("p");
+        desc.textContent =
+          "Hệ thống đã tự động nhận diện giao dịch chuyển khoản thành công. Đơn hàng của bạn đang được chuẩn bị để giao đi ngay lập tức.";
+        desc.style.color = "#166534";
+        document.getElementById("btn-simulate-pay").style.display = "none";
+        if (window.lucide) lucide.createIcons();
+      }
+
+      async function simulatePayment() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get("id");
+        if (!orderId) return;
+
+        try {
+          const res = await fetch(`/api/sales/${orderId}/mock-pay`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+          });
+          const result = await res.json();
+          if (result.success) {
+            if (window.paymentPollInterval)
+              clearInterval(window.paymentPollInterval);
+            showPaidState();
+          } else {
+            alert("Lỗi giả lập: " + result.error);
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Lỗi kết nối khi giả lập.");
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get("id");
+
+        // Format Currency
+        const formatVND = (num) =>
+          new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+          }).format(num);
+
+        if (orderId) {
+          // Fetch dynamic order data if ID is present
+          try {
+            const res = await fetch(`/api/sales/${orderId}`);
+            const order = await res.json();
+
+            if (order && !order.error) {
+              document.getElementById("order-id").textContent =
+                `#ORD-${order.id}`;
+              document.getElementById("order-total").textContent = formatVND(
+                order.final_amount,
+              );
+
+              const itemsContainer = document.getElementById("summary-items");
+              itemsContainer.innerHTML = order.items
+                .map((item, index) => {
+                  const isLast = index === order.items.length - 1;
+                  const borderStyle = isLast
+                    ? "border-bottom: none; padding-bottom: 0;"
+                    : "";
+
+                  return `
+                            <div class="success-item" style="${borderStyle}">
+                                <div class="success-item-img">
+                                    <i data-lucide="package" style="width: 24px; height: 24px;"></i>
+                                </div>
+                                <div class="success-item-info">
+                                    <div class="success-item-title">${item.product_name}</div>
+                                    <div class="success-item-qty">Số lượng: ${item.quantity}</div>
+                                </div>
+                                <div class="success-item-price">${formatVND(item.subtotal)}</div>
+                            </div>
+                        `;
+                })
+                .join("");
+
+              // Check if payment method is bank transfer
+              if (order.payment_method === "transfer") {
+                document.getElementById("transfer-payment-box").style.display =
+                  "block";
+                document.getElementById("transfer-box-amount").textContent =
+                  formatVND(order.final_amount);
+
+                const accountNo = "103877087416";
+                const accountName = encodeURIComponent("Do Thi Thuy");
+                const description = encodeURIComponent(
+                  `ThuyRMart CK HD${order.id}`,
+                );
+                const qrUrl = `https://img.vietqr.io/image/vietinbank-${accountNo}-qr_only.png?amount=${order.final_amount}&addInfo=${description}&accountName=${accountName}`;
+                document.getElementById("transfer-box-qr").src = qrUrl;
+
+                if (order.paid_amount >= order.final_amount) {
+                  showPaidState();
+                } else {
+                  // Start polling status every 3 seconds
+                  window.paymentPollInterval = setInterval(async () => {
+                    try {
+                      const checkRes = await fetch(`/api/sales/${orderId}`);
+                      const checkOrder = await checkRes.json();
+                      if (checkOrder.paid_amount >= checkOrder.final_amount) {
+                        clearInterval(window.paymentPollInterval);
+                        showPaidState();
+                      }
+                    } catch (e) {
+                      console.error("Polling error", e);
+                    }
+                  }, 3000);
+                }
+              }
+
+              lucide.createIcons();
+            }
+          } catch (err) {
+            console.error("Error fetching order:", err);
+            document.getElementById("order-id").textContent =
+              `#ORD-${orderId} (Lỗi hiển thị chi tiết)`;
+          }
+        }
+      });
+    </script>
+    <script src="/js/ai-chatbox.js"></script>
+  </body>
+</html>

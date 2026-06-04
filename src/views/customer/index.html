@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTDS Shop - Ocean ThuyR Mart</title>
+    <link rel="stylesheet" href="/css/customer.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                <span style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 20px; color: var(--primary);">ThuyR <span style="color: #059669; font-size: 16px;">Mart</span></span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+            <div class="header-actions">
+                <a href="#" class="action-btn"><i data-lucide="bell"></i></a>
+                <a href="/cart" class="action-btn" style="position: relative;">
+                    <i data-lucide="shopping-cart"></i>
+                    <span id="cart-count" class="cart-count">0</span>
+                </a>
+                <a href="/login" class="btn-primary" id="auth-links">Account</a>
+                <div id="user-profile" style="display: none; align-items: center; gap: 8px;">
+                    <a href="/account" style="text-decoration: none; color: var(--on-surface); font-weight: 600;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--surface-container); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 14px;" id="user-initials"></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero-section">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <h1>Nâng Tầm Trải Nghiệm<br>Dịch Vụ Hiện Đại</h1>
+                <p>Giải pháp toàn diện giúp tối ưu hóa quy trình, mang đến hiệu suất vượt trội và sự tin cậy tuyệt đối cho doanh nghiệp của bạn trong kỷ nguyên số.</p>
+                <div style="display: flex; gap: 16px;">
+                    <a href="/products" class="btn-primary" style="padding: 16px 32px; border-radius: 12px; font-size: 16px;">Khám phá ngay</a>
+                    <a href="#" class="btn-outline" style="padding: 16px 32px; border-radius: 12px; font-size: 16px;">Tìm hiểu thêm</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200" alt="Modern Office">
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Values -->
+    <section class="section" style="background: var(--surface-container-lowest);">
+        <div class="container">
+            <div class="section-title">
+                <h2>Giá Trị Cốt Lõi</h2>
+                <p>Nền tảng vững chắc cho mọi sự hợp tác thành công, cam kết mang lại giá trị thực tế và bền vững.</p>
+            </div>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon"><i data-lucide="award"></i></div>
+                    <h3>Chuyên nghiệp</h3>
+                    <p>Quy trình chuẩn hóa, đội ngũ chuyên gia giàu kinh nghiệm đảm bảo chất lượng đầu ra xuất sắc.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i data-lucide="shield-check"></i></div>
+                    <h3>An toàn</h3>
+                    <p>Bảo mật dữ liệu tuyệt đối với hệ thống mã hóa tiên tiến và chính sách quản lý rủi ro nghiêm ngặt.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i data-lucide="zap"></i></div>
+                    <h3>Nhanh chóng</h3>
+                    <p>Tối ưu hóa thời gian triển khai, đáp ứng kịp thời mọi nhu cầu cấp bách của doanh nghiệp.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i data-lucide="piggy-bank"></i></div>
+                    <h3>Tiết kiệm</h3>
+                    <p>Chi phí tối ưu thông qua việc loại bỏ các bước thừa, tập trung vào hiệu quả cốt lõi.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="section">
+        <div class="container">
+            <div class="products-header">
+                <div>
+                    <h2 style="font-family: var(--font-display); font-size: 32px; font-weight: 800; margin-bottom: 8px;">Sản phẩm nổi bật</h2>
+                    <p style="color: var(--on-surface-variant);">Giải pháp đột phá cho tương lai số.</p>
+                </div>
+                <a href="/products" style="color: var(--primary); font-weight: 700; text-decoration: none; font-size: 14px;">Xem tất cả <i data-lucide="arrow-right" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-left: 4px;"></i></a>
+            </div>
+            <div class="featured-grid" id="featured-products">
+                <!-- Products will be loaded via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Process -->
+    <section class="process-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Quy Trình Chuẩn Hóa</h2>
+                <p>Thiết kế để tối đa hóa hiệu suất và giảm thiểu rủi ro qua từng bước rõ ràng.</p>
+            </div>
+            <div class="process-grid">
+                <div class="process-item">
+                    <div class="process-icon"><i data-lucide="search"></i></div>
+                    <h4>1. Tìm kiếm</h4>
+                    <p>Xác định nhu cầu và giải pháp phù hợp nhất.</p>
+                </div>
+                <div class="process-item">
+                    <div class="process-icon"><i data-lucide="shopping-bag"></i></div>
+                    <h4>2. Đặt hàng</h4>
+                    <p>Ký kết và thiết lập thông số ban đầu.</p>
+                </div>
+                <div class="process-item">
+                    <div class="process-icon"><i data-lucide="pie-chart"></i></div>
+                    <h4>3. Theo dõi</h4>
+                    <p>Giám sát tiến độ realtime qua hệ thống.</p>
+                </div>
+                <div class="process-item">
+                    <div class="process-icon"><i data-lucide="package"></i></div>
+                    <h4>4. Nhận hàng</h4>
+                    <p>Bàn giao, nghiệm thu và hỗ trợ sau triển khai.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-icon"><i data-lucide="rocket" style="width: 56px; height: 56px; stroke-width: 1.5;"></i></div>
+            <h2 style="font-family: var(--font-display); font-size: 36px; font-weight: 800; margin-bottom: 16px;">Sẵn sàng bắt đầu?</h2>
+            <p>Tham gia cùng hàng ngàn doanh nghiệp đã chuyển đổi số thành công. Trải nghiệm dịch vụ chuyên nghiệp, minh bạch và hiệu quả ngay hôm nay.</p>
+            <a href="/register" class="btn-primary" style="padding: 18px 48px; border-radius: 12px; font-size: 16px; font-weight: 700;">Đăng ký ngay hôm nay</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+                <footer class="footer" style="background-color: var(--surface-container); border-top: 1px solid var(--outline-variant); padding: 60px 0 20px;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                <!-- Company Info -->
+                <div>
+                    <a href="/" class="footer-logo" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 20px;">
+                        <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                        <span style="font-size: 1.5rem; font-weight: 800; color: var(--on-surface); font-family: 'Manrope', sans-serif;">ThuyR Mart</span>
+                    </a>
+                    <p style="color: var(--on-surface-variant); line-height: 1.6; font-size: 0.95rem; margin-bottom: 20px;">
+                        Hệ thống bán lẻ ThuyR Mart cam kết mang đến cho bạn những sản phẩm chất lượng nhất với giá cả hợp lý và dịch vụ tận tâm.
+                    </p>
+                    <div style="display: flex; gap: 16px;">
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="facebook" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="instagram" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="youtube" style="width: 20px; height: 20px;"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Liên kết nhanh</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="/" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Trang chủ</a></li>
+                        <li><a href="/products" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Sản phẩm</a></li>
+                        <li><a href="/about" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Về chúng tôi</a></li>
+                        <li><a href="/contact" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Liên hệ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Customer Support -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Hỗ trợ khách hàng</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách bảo mật</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Điều khoản dịch vụ</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách đổi trả</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Hướng dẫn mua hàng</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Thông tin liên hệ</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px;">
+                        <li style="display: flex; align-items: flex-start; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="map-pin" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>123 Đường Bách Khoa, Quận Hai Bà Trưng, Hà Nội</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="phone" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>0399.501.846</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="mail" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>support@thuyrmart.vn</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div style="border-top: 1px solid var(--outline-variant); padding-top: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                <p style="font-size: 0.9rem; color: var(--on-surface-variant); margin: 0;">
+                    &copy; 2026 ThuyR Mart. All rights reserved.
+                </p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <i data-lucide="credit-card" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="wallet" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="banknote" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/customer.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        document.addEventListener('DOMContentLoaded', () => {
+            window.loadAllProducts('featured-products');
+        });
+    </script>
+    <script src="/js/ai-chatbox.js"></script>
+</body>
+</html>

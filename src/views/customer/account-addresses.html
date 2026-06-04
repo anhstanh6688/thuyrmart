@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sổ địa chỉ - ThuyR Mart</title>
+    <link rel="stylesheet" href="/css/customer.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0; padding: 0; background: var(--surface-bright);">
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                <span style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 20px; color: var(--primary);">ThuyR <span style="color: #059669; font-size: 16px;">Mart</span></span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+            <div class="header-actions">
+                <button class="action-btn" aria-label="Notifications"><i data-lucide="bell" style="width: 20px; height: 20px;"></i></button>
+                <a href="/cart" class="action-btn" aria-label="Cart"><i data-lucide="shopping-cart" style="width: 20px; height: 20px;"></i></a>
+                <a href="/account" class="action-btn" style="display: flex; align-items: center; gap: 8px; border-left: 1px solid var(--outline-variant); padding-left: 20px; text-decoration: none;">
+                    <span style="font-size: 14px; font-weight: 600; color: var(--primary);">Account</span>
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=150" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="account-page">
+        <div class="container">
+            <div class="account-layout">
+                <!-- Sidebar -->
+                <aside class="account-sidebar">
+                    <div style="margin-bottom: 24px;">
+                        <h2 style="font-size: 18px; font-weight: 700; color: var(--on-surface); margin-bottom: 4px;">Tài khoản của tôi</h2>
+                        <p style="font-size: 13px; color: var(--on-surface-variant);">Quản lý thông tin và đơn hàng</p>
+                    </div>
+                    <div class="account-nav-divider" style="margin-bottom: 24px;"></div>
+                    
+                    <ul class="account-nav">
+                        <li class="account-nav-item">
+                            <a href="/account" class="account-nav-link">
+                                <i data-lucide="user" style="width: 18px; height: 18px;"></i> Hồ sơ cá nhân
+                            </a>
+                        </li>
+                        <li class="account-nav-item">
+                            <a href="/account-orders" class="account-nav-link">
+                                <i data-lucide="file-text" style="width: 18px; height: 18px;"></i> Đơn hàng của tôi
+                            </a>
+                        </li>
+                        <li class="account-nav-item">
+                            <a href="/account-addresses" class="account-nav-link active">
+                                <i data-lucide="map-pin" style="width: 18px; height: 18px;"></i> Sổ địa chỉ
+                            </a>
+                        </li>
+                        <li class="account-nav-item">
+                            <a href="/account-wishlist" class="account-nav-link">
+                                <i data-lucide="heart" style="width: 18px; height: 18px;"></i> Sản phẩm yêu thích
+                            </a>
+                        </li>
+                        
+                        <div class="account-nav-divider" style="margin-top: 24px; margin-bottom: 24px;"></div>
+                        
+                        <li class="account-nav-item">
+                            <a href="#" class="account-nav-link" id="logout-btn">
+                                <i data-lucide="log-out" style="width: 18px; height: 18px;"></i> Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </aside>
+
+                <!-- Addresses Section -->
+                <section>
+                    <div class="orders-header">
+                        <h1 style="font-size: 24px; font-weight: 700; color: var(--on-surface);">Sổ địa chỉ</h1>
+                        <button class="btn btn-primary" onclick="openAddressModal()" style="padding: 10px 16px; border-radius: 8px; font-size: 14px;"><i data-lucide="plus" style="width: 18px; height: 18px; margin-right: 4px;"></i> Thêm địa chỉ mới</button>
+                    </div>
+
+                    <div id="empty-address" style="text-align: center; padding: 60px 20px; background: white; border-radius: 12px; border: 1px solid var(--outline-variant); display: none;">
+                        <div style="width: 64px; height: 64px; background: var(--surface-container-high); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                            <i data-lucide="map-pin" style="width: 32px; height: 32px; color: var(--on-surface-variant);"></i>
+                        </div>
+                        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Chưa có địa chỉ nào</h3>
+                        <p style="color: var(--on-surface-variant); font-size: 14px; max-width: 400px; margin: 0 auto;">Vui lòng thêm địa chỉ giao hàng để thuận tiện hơn trong việc mua sắm ở các lần sau.</p>
+                    </div>
+
+                    <div id="addresses-list" style="display: flex; flex-direction: column; gap: 16px; margin-top: 24px;">
+                        <!-- JS renders addresses here -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer matches screenshot -->
+            <footer class="footer" style="background-color: var(--surface-container); border-top: 1px solid var(--outline-variant); padding: 60px 0 20px;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                <!-- Company Info -->
+                <div>
+                    <a href="/" class="footer-logo" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 20px;">
+                        <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                        <span style="font-size: 1.5rem; font-weight: 800; color: var(--on-surface); font-family: 'Manrope', sans-serif;">ThuyR Mart</span>
+                    </a>
+                    <p style="color: var(--on-surface-variant); line-height: 1.6; font-size: 0.95rem; margin-bottom: 20px;">
+                        Hệ thống bán lẻ ThuyR Mart cam kết mang đến cho bạn những sản phẩm chất lượng nhất với giá cả hợp lý và dịch vụ tận tâm.
+                    </p>
+                    <div style="display: flex; gap: 16px;">
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="facebook" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="instagram" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="youtube" style="width: 20px; height: 20px;"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Liên kết nhanh</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="/" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Trang chủ</a></li>
+                        <li><a href="/products" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Sản phẩm</a></li>
+                        <li><a href="/about" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Về chúng tôi</a></li>
+                        <li><a href="/contact" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Liên hệ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Customer Support -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Hỗ trợ khách hàng</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách bảo mật</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Điều khoản dịch vụ</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách đổi trả</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Hướng dẫn mua hàng</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Thông tin liên hệ</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px;">
+                        <li style="display: flex; align-items: flex-start; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="map-pin" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>123 Đường Bách Khoa, Quận Hai Bà Trưng, Hà Nội</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="phone" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>0399.501.846</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="mail" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>support@thuyrmart.vn</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div style="border-top: 1px solid var(--outline-variant); padding-top: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                <p style="font-size: 0.9rem; color: var(--on-surface-variant); margin: 0;">
+                    &copy; 2026 ThuyR Mart. All rights reserved.
+                </p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <i data-lucide="credit-card" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="wallet" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="banknote" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Address Modal -->
+    <div id="address-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 12px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                <h3 id="modal-title" style="font-size: 20px; font-weight: 700; color: var(--on-surface); margin: 0;">Thêm địa chỉ mới</h3>
+                <button type="button" onclick="closeAddressModal()" style="background: none; border: none; cursor: pointer; color: var(--on-surface-variant);">
+                    <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+                </button>
+            </div>
+            
+            <form id="address-form">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: var(--on-surface); margin-bottom: 8px;">Họ và tên</label>
+                        <input type="text" id="addr-name" required style="width: 100%; padding: 12px; border: 1px solid var(--outline); border-radius: 8px; font-size: 14px;" placeholder="Tên người nhận">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: var(--on-surface); margin-bottom: 8px;">Số điện thoại</label>
+                        <input type="text" id="addr-phone" required style="width: 100%; padding: 12px; border: 1px solid var(--outline); border-radius: 8px; font-size: 14px;" placeholder="SĐT người nhận">
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: var(--on-surface); margin-bottom: 8px;">Tỉnh/Thành phố, Quận/Huyện, Phường/Xã</label>
+                    <input type="text" id="addr-region" required style="width: 100%; padding: 12px; border: 1px solid var(--outline); border-radius: 8px; font-size: 14px;" placeholder="VD: Hà Nội, Quận Cầu Giấy, Phường Dịch Vọng">
+                </div>
+                
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: var(--on-surface); margin-bottom: 8px;">Địa chỉ cụ thể</label>
+                    <textarea id="addr-detail" required rows="3" style="width: 100%; padding: 12px; border: 1px solid var(--outline); border-radius: 8px; font-size: 14px; resize: none;" placeholder="Số nhà, Tên đường..."></textarea>
+                </div>
+                
+                <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 24px; cursor: pointer;">
+                    <input type="checkbox" id="addr-default" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                    <span style="font-size: 14px; color: var(--on-surface);">Đặt làm địa chỉ mặc định</span>
+                </label>
+                
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" onclick="closeAddressModal()" class="btn-ghost" style="padding: 10px 20px; border-radius: 8px; font-weight: 600;">Hủy</button>
+                    <button type="submit" class="btn-primary" style="padding: 10px 20px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer;">Lưu địa chỉ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let editingAddressId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('customer')) {
+                window.location.href = '/login';
+                return;
+            }
+            renderAddresses();
+            lucide.createIcons();
+        });
+
+        const addressModal = document.getElementById('address-modal');
+        const emptyState = document.getElementById('empty-address');
+        const addressesList = document.getElementById('addresses-list');
+        const form = document.getElementById('address-form');
+
+        function openAddressModal(id = null) {
+            editingAddressId = id;
+            const title = document.getElementById('modal-title');
+            if (id) {
+                title.textContent = 'Cập nhật địa chỉ';
+                let addrs = JSON.parse(localStorage.getItem('addresses_' + (JSON.parse(localStorage.getItem('customer') || '{}').phone || 'guest'))) || [];
+                const addr = addrs.find(a => a.id === id);
+                if (addr) {
+                    document.getElementById('addr-name').value = addr.name;
+                    document.getElementById('addr-phone').value = addr.phone;
+                    document.getElementById('addr-region').value = addr.region;
+                    document.getElementById('addr-detail').value = addr.detail;
+                    document.getElementById('addr-default').checked = addr.isDefault;
+                }
+            } else {
+                title.textContent = 'Thêm địa chỉ mới';
+                form.reset();
+            }
+            addressModal.style.display = 'flex';
+        }
+
+        function closeAddressModal() {
+            addressModal.style.display = 'none';
+            editingAddressId = null;
+            form.reset();
+        }
+
+        async function deleteAddress(id) {
+            if (!await confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) return;
+            
+            let addrs = JSON.parse(localStorage.getItem('addresses_' + (JSON.parse(localStorage.getItem('customer') || '{}').phone || 'guest'))) || [];
+            addrs = addrs.filter(a => a.id !== id);
+            
+            if (addrs.length > 0 && !addrs.some(a => a.isDefault)) {
+                addrs[0].isDefault = true;
+            }
+            
+            localStorage.setItem('addresses_' + (JSON.parse(localStorage.getItem('customer') || '{}').phone || 'guest'), JSON.stringify(addrs));
+            alert('Đã xóa địa chỉ thành công!');
+            renderAddresses();
+        }
+
+        function renderAddresses() {
+            let addrs = JSON.parse(localStorage.getItem('addresses_' + (JSON.parse(localStorage.getItem('customer') || '{}').phone || 'guest'))) || [];
+            if (addrs.length === 0) {
+                emptyState.style.display = 'block';
+                addressesList.style.display = 'none';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            addressesList.style.display = 'flex';
+            
+            addressesList.innerHTML = addrs.map(addr => `
+                <div style="background: white; border: 1px solid var(--outline-variant); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: flex-start; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                            <h4 style="font-size: 16px; font-weight: 700; color: var(--on-surface); margin: 0;">${addr.name}</h4>
+                            <span style="font-size: 14px; color: var(--on-surface-variant);">|</span>
+                            <span style="font-size: 14px; color: var(--on-surface-variant);">${addr.phone}</span>
+                            ${addr.isDefault ? '<span style="background: var(--primary); color: white; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px;">Mặc định</span>' : ''}
+                        </div>
+                        <p style="font-size: 14px; color: var(--on-surface-variant); margin: 0 0 4px 0;">${addr.detail}</p>
+                        <p style="font-size: 14px; color: var(--on-surface-variant); margin: 0;">${addr.region}</p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="openAddressModal('${addr.id}')" style="background: var(--surface-container-low); border: 1px solid var(--outline-variant); color: var(--primary); font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 8px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; outline: none;" onmouseover="this.style.background='var(--surface-container-high)'" onmouseout="this.style.background='var(--surface-container-low)'">
+                            <i data-lucide="edit-2" style="width: 14px; height: 14px;"></i> Sửa
+                        </button>
+                        <button onclick="deleteAddress('${addr.id}')" style="background: #fef2f2; border: 1px solid #fee2e2; color: #ef4444; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 8px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; outline: none;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fef2f2'">
+                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Xóa
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Kích hoạt Lucide render icon động
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const addrName = document.getElementById('addr-name').value;
+            const addrPhone = document.getElementById('addr-phone').value;
+            const addrRegion = document.getElementById('addr-region').value;
+            const addrDetail = document.getElementById('addr-detail').value;
+            const addrDefault = document.getElementById('addr-default').checked;
+            
+            let addrs = JSON.parse(localStorage.getItem('addresses_' + (JSON.parse(localStorage.getItem('customer') || '{}').phone || 'guest'))) || [];
+            
+            if (addrDefault) {
+                addrs.forEach(a => a.isDefault = false);
+            }
+            
+            if (editingAddressId) {
+                const addr = addrs.find(a => a.id === editingAddressId);
+                if (addr) {
+                    addr.name = addrName;
+                    addr.phone = addrPhone;
+                    addr.region = addrRegion;
+                    addr.detail = addrDetail;
+                    addr.isDefault = addrDefault || (addrs.length === 1);
+                }
+                alert('Đã cập nhật địa chỉ thành công!');
+            } else {
+                const newAddr = {
+                    id: Date.now().toString(),
+                    name: addrName,
+                    phone: addrPhone,
+                    region: addrRegion,
+                    detail: addrDetail,
+                    isDefault: addrDefault || (addrs.length === 0)
+                };
+                addrs.push(newAddr);
+                alert('Đã lưu địa chỉ thành công!');
+            }
+            
+            localStorage.setItem('addresses_' + (JSON.parse(localStorage.getItem('customer') || '{}').phone || 'guest'), JSON.stringify(addrs));
+            
+            closeAddressModal();
+            renderAddresses();
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('customer');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        });
+    </script>
+    <script src="/js/customer.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userStr = localStorage.getItem('customer');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    const headerAvatar = document.querySelector('.header-actions img');
+                    if (headerAvatar && user.avatar) {
+                        headerAvatar.src = user.avatar;
+                    }
+                } catch(e) {}
+            }
+        });
+    </script>
+    <script src="/js/ai-chatbox.js"></script>
+</body>
+</html>

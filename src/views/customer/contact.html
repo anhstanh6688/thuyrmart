@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Liên hệ - ThuyR Mart</title>
+    <link rel="stylesheet" href="/css/customer.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container header-container">
+        <a
+          href="/"
+          class="logo"
+          style="display: flex; align-items: center; gap: 8px"
+        >
+          <img
+            src="/img/logo.png"
+            alt="Logo"
+            style="
+              height: 32px;
+              width: 32px;
+              border-radius: 50%;
+              object-fit: cover;
+            "
+          />
+          <span
+            style="
+              font-family: &quot;Inter&quot;, sans-serif;
+              font-weight: 800;
+              font-size: 20px;
+              color: var(--primary);
+            "
+            >ThuyR
+            <span style="color: #059669; font-size: 16px">Mart</span></span
+          >
+        </a>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/products">Products</a></li>
+          <li><a href="#">About</a></li>
+          <li><a href="/contact" class="active">Contact</a></li>
+        </ul>
+        <div class="header-actions">
+          <button class="action-btn" aria-label="Notifications">
+            <i data-lucide="bell" style="width: 20px; height: 20px"></i>
+          </button>
+          <a href="/cart" class="action-btn" aria-label="Cart"
+            ><i
+              data-lucide="shopping-cart"
+              style="width: 20px; height: 20px"
+            ></i
+          ></a>
+          <a
+            href="/account"
+            class="action-btn"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              border-left: 1px solid var(--outline-variant);
+              padding-left: 20px;
+              text-decoration: none;
+            "
+          >
+            <span
+              style="font-size: 14px; font-weight: 600; color: var(--primary)"
+              >Account</span
+            >
+            <img
+              src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=150"
+              alt="Avatar"
+              style="
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                object-fit: cover;
+              "
+            />
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+      <div class="container">
+        <div class="contact-header">
+          <h1 class="contact-title">Liên hệ với chúng tôi</h1>
+          <p class="contact-subtitle">
+            Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ. Hãy gửi tin nhắn cho
+            chúng tôi nếu bạn có bất kỳ câu hỏi nào về dịch vụ hoặc sản phẩm.
+          </p>
+        </div>
+
+        <div class="contact-layout">
+          <!-- Form Column -->
+          <div class="contact-form-card">
+            <h2 class="contact-form-title">Gửi tin nhắn</h2>
+            <form
+              onsubmit="
+                event.preventDefault();
+                alert('Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi sớm nhất.');
+              "
+            >
+              <div class="contact-form-group">
+                <label class="contact-form-label">Họ và tên</label>
+                <input
+                  type="text"
+                  class="contact-form-input"
+                  placeholder="Nhập họ và tên của bạn"
+                  required
+                />
+              </div>
+              <div class="contact-form-group">
+                <label class="contact-form-label">Email</label>
+                <input
+                  type="email"
+                  class="contact-form-input"
+                  placeholder="Nhập địa chỉ email"
+                  required
+                />
+              </div>
+              <div class="contact-form-group">
+                <label class="contact-form-label">Chủ đề</label>
+                <input
+                  type="text"
+                  class="contact-form-input"
+                  placeholder="Chủ đề tin nhắn"
+                  required
+                />
+              </div>
+              <div class="contact-form-group">
+                <label class="contact-form-label">Nội dung</label>
+                <textarea
+                  class="contact-form-textarea"
+                  placeholder="Nhập nội dung tin nhắn của bạn..."
+                  required
+                ></textarea>
+              </div>
+              <button type="submit" class="btn-submit-contact">
+                <i data-lucide="send" style="width: 18px; height: 18px"></i> Gửi
+                tin nhắn
+              </button>
+            </form>
+          </div>
+
+          <!-- Info Column -->
+          <div>
+            <div class="contact-info-grid">
+              <div class="contact-info-card">
+                <div class="contact-info-icon">
+                  <i
+                    data-lucide="map-pin"
+                    style="width: 20px; height: 20px"
+                  ></i>
+                </div>
+                <div class="contact-info-content">
+                  <h3>Địa chỉ</h3>
+                  <p>Tổ dân phố Thư Đôi,<br />Ninh Xá, TP. Bắc Ninh</p>
+                </div>
+              </div>
+              <div class="contact-info-card">
+                <div class="contact-info-icon">
+                  <i data-lucide="phone" style="width: 20px; height: 20px"></i>
+                </div>
+                <div class="contact-info-content">
+                  <h3>Hotline</h3>
+                  <p>1900 1234 56<br />+84 90 123 4567</p>
+                </div>
+              </div>
+              <div class="contact-info-card full-width">
+                <div class="contact-info-icon">
+                  <i data-lucide="mail" style="width: 20px; height: 20px"></i>
+                </div>
+                <div class="contact-info-content">
+                  <h3>Email</h3>
+                  <p>anhnguynht@gmail.com</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="contact-map-card">
+              <img
+                src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=800"
+                alt="Map"
+                class="contact-map-image"
+                style="filter: grayscale(80%) opacity(0.8)"
+              />
+              <div
+                style="
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  color: var(--on-surface-variant);
+                "
+              >
+                <i
+                  data-lucide="map-pin"
+                  style="
+                    width: 48px;
+                    height: 48px;
+                    fill: var(--on-surface-variant);
+                    stroke: white;
+                    stroke-width: 1;
+                  "
+                ></i>
+              </div>
+              <div class="contact-map-overlay">
+                <i
+                  data-lucide="info"
+                  style="width: 16px; height: 16px; color: var(--primary)"
+                ></i>
+                <span>Bản đồ chỉ dẫn đường đi tới văn phòng chính.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+            <footer class="footer" style="background-color: var(--surface-container); border-top: 1px solid var(--outline-variant); padding: 60px 0 20px;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                <!-- Company Info -->
+                <div>
+                    <a href="/" class="footer-logo" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 20px;">
+                        <img src="/img/logo.png" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover;">
+                        <span style="font-size: 1.5rem; font-weight: 800; color: var(--on-surface); font-family: 'Manrope', sans-serif;">ThuyR Mart</span>
+                    </a>
+                    <p style="color: var(--on-surface-variant); line-height: 1.6; font-size: 0.95rem; margin-bottom: 20px;">
+                        Hệ thống bán lẻ ThuyR Mart cam kết mang đến cho bạn những sản phẩm chất lượng nhất với giá cả hợp lý và dịch vụ tận tâm.
+                    </p>
+                    <div style="display: flex; gap: 16px;">
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="facebook" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="instagram" style="width: 20px; height: 20px;"></i></a>
+                        <a href="#" style="color: var(--on-surface-variant); transition: color 0.2s;"><i data-lucide="youtube" style="width: 20px; height: 20px;"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Liên kết nhanh</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="/" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Trang chủ</a></li>
+                        <li><a href="/products" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Sản phẩm</a></li>
+                        <li><a href="/about" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Về chúng tôi</a></li>
+                        <li><a href="/contact" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Liên hệ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Customer Support -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Hỗ trợ khách hàng</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách bảo mật</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Điều khoản dịch vụ</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Chính sách đổi trả</a></li>
+                        <li><a href="#" style="color: var(--on-surface-variant); text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">Hướng dẫn mua hàng</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--on-surface); margin-bottom: 20px; font-family: 'Manrope', sans-serif;">Thông tin liên hệ</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px;">
+                        <li style="display: flex; align-items: flex-start; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="map-pin" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>123 Đường Bách Khoa, Quận Hai Bà Trưng, Hà Nội</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="phone" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>0399.501.846</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 12px; color: var(--on-surface-variant); font-size: 0.95rem;">
+                            <i data-lucide="mail" style="width: 20px; height: 20px; color: var(--primary); flex-shrink: 0;"></i>
+                            <span>support@thuyrmart.vn</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div style="border-top: 1px solid var(--outline-variant); padding-top: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                <p style="font-size: 0.9rem; color: var(--on-surface-variant); margin: 0;">
+                    &copy; 2026 ThuyR Mart. All rights reserved.
+                </p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <i data-lucide="credit-card" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="wallet" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                    <i data-lucide="banknote" style="width: 24px; height: 24px; color: var(--on-surface-variant);"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+      lucide.createIcons();
+    </script>
+    <script src="/js/customer.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const userStr = localStorage.getItem("customer");
+        if (userStr) {
+          try {
+            const user = JSON.parse(userStr);
+            const headerAvatar = document.querySelector(".header-actions img");
+            if (headerAvatar && user.avatar) {
+              headerAvatar.src = user.avatar;
+            }
+          } catch (e) {}
+        }
+      });
+    </script>
+      <script src="/js/ai-chatbox.js"></script>
+</body>
+</html>
