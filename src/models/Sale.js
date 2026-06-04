@@ -191,8 +191,13 @@ class Sale {
     }
 
     static async checkExpired(saleDoc) {
-        // Tính năng tự động hủy đơn sau 10 phút đã bị vô hiệu hóa
-        // để hỗ trợ việc giao hàng tận nơi (đơn có thể chờ xử lý lâu hơn 10 phút)
+        // Hóa đơn chuyển khoản chưa thanh toán và ở trạng thái pending sẽ hết hạn sau 10 phút
+        if (saleDoc.payment_method === 'transfer' && saleDoc.status === 'pending' && saleDoc.paid_amount < saleDoc.final_amount) {
+            const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+            if (saleDoc.createdAt < tenMinutesAgo) {
+                return true;
+            }
+        }
         return false;
     }
 

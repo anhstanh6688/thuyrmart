@@ -25,6 +25,9 @@
         .order-detail-item {
             display: flex; gap: 12px; margin-bottom: 12px; border-bottom: 1px dashed var(--outline-variant); padding-bottom: 12px;
         }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
     <!-- Header -->
     <header class="header">
@@ -195,6 +198,11 @@
                     <div style="font-size: 14px; color: var(--on-surface-variant);">Số tiền cần thanh toán</div>
                     <div id="qr-amount" style="font-size: 24px; font-weight: 800; color: var(--primary);">0 đ</div>
                     <div id="qr-order-id" style="font-size: 13px; color: var(--on-surface-variant); margin-top: 4px;"></div>
+                    <!-- Plain text memo for easy copying -->
+                    <div style="margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;">
+                        <span>Nội dung:</span> <strong id="qr-memo" style="color: #b45309;">Loading...</strong>
+                        <button onclick="navigator.clipboard.writeText(document.getElementById('qr-memo').textContent); alert('Đã sao chép nội dung chuyển khoản!')" style="padding: 2px 6px; font-size: 11px; background: #e2e8f0; border: none; border-radius: 4px; cursor: pointer; color: #1f2937;">Sao chép</button>
+                    </div>
                 </div>
             </div>
 
@@ -208,7 +216,10 @@
                 <div id="discount-msg" style="font-size: 13px; margin-top: 4px; color: #059669; display: none;">Áp dụng thành công!</div>
             </div>
 
-            <button id="btn-confirm-payment" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 15px;">Tôi đã chuyển khoản thành công</button>
+            <div id="modal-payment-status" style="padding: 12px; background: #fffbeb; border-radius: 8px; border: 1px solid #fef3c7; color: #b45309; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #b45309; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></span>
+                <span>Đang chờ chuyển khoản tự động (Hết hạn sau 10:00)...</span>
+            </div>
         </div>
     </div>
 
@@ -381,10 +392,20 @@
                 
                 let statusClass = 'completed';
                 let statusText = 'Hoàn thành';
-                if (isPending) { statusClass = 'pending'; statusText = 'Chờ xử lý'; }
-                if (isDelivering) { statusClass = 'pending'; statusText = 'Đang giao'; }
-                if (isCancelled) { statusClass = 'cancelled'; statusText = 'Đã hủy'; }
-                if (isExpired) { statusClass = 'cancelled'; statusText = 'Hết hạn'; }
+                let statusTextHtml = statusText;
+                if (isPending) { 
+                    statusClass = 'pending'; 
+                    statusText = 'Chờ xử lý'; 
+                    if (order.payment_method === 'transfer') {
+                        const expireTime = new Date(order.order_date).getTime() + 10 * 60 * 1000;
+                        statusTextHtml = `Chờ xử lý<br><span class="countdown-timer" data-time="${expireTime}" style="font-size: 11px; color: #d97706; font-weight: 500; display: block; margin-top: 2px;">Tính toán...</span>`;
+                    } else {
+                        statusTextHtml = statusText;
+                    }
+                }
+                if (isDelivering) { statusClass = 'pending'; statusTextHtml = 'Đang giao'; }
+                if (isCancelled) { statusClass = 'cancelled'; statusTextHtml = 'Đã hủy'; }
+                if (isExpired) { statusClass = 'cancelled'; statusTextHtml = 'Hết hạn'; }
 
                 const date = new Date(order.order_date).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' });
                 
@@ -402,7 +423,7 @@
                         <td style="color: var(--on-surface-variant);">${date}</td>
                         <td>
                             <div class="status-badge ${statusClass}" style="${isPending ? 'background:#fef3c7; color:#d97706;' : isDelivering ? 'background:#e0e7ff; color:#4338ca;' : isExpired ? 'background:#fee2e2; color:#b91c1c;' : ''}">
-                                <div class="dot" style="${isPending ? 'background:#d97706;' : isDelivering ? 'background:#4338ca;' : isExpired ? 'background:#b91c1c;' : ''}"></div> ${statusText}
+                                <div class="dot" style="${isPending ? 'background:#d97706;' : isDelivering ? 'background:#4338ca;' : isExpired ? 'background:#b91c1c;' : ''}"></div> ${statusTextHtml}
                             </div>
                         </td>
                         <td style="font-weight: 600; ${(isCancelled || isExpired) ? 'color: var(--on-surface-variant); text-decoration: line-through;' : ''}">${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.final_amount)}</td>
@@ -443,6 +464,8 @@
         // Payment logic
         let currentPayingOrderId = null;
         let currentPayingAmount = 0;
+        let paymentPollInterval = null;
+        let modalCountdownInterval = null;
 
         function openPaymentModal(orderId, amount) {
             currentPayingOrderId = orderId;
@@ -453,20 +476,66 @@
             document.getElementById('qr-amount').textContent = formattedAmount;
             document.getElementById('qr-order-id').textContent = `Mã đơn: #${orderId.substring(0, 8).toUpperCase()}`;
             
-            // Use VietQR API to generate QR image (Mockup with typical format)
-            // Format: https://img.vietqr.io/image/BANK_ID-ACCOUNT_NO-TEMPLATE.png?amount=AMOUNT&addInfo=DESCRIPTION&accountName=NAME
-            // We use a mockup generic bank
-            const qrUrl = `https://img.vietqr.io/image/970436-0987654321-compact.png?amount=${amount}&addInfo=Thanh toan don hang ${orderId.substring(0, 8).toUpperCase()}&accountName=THUYR MART`;
+            // Generate BIDV VietQR code
+            const accountNo = "8871414053";
+            const accountName = encodeURIComponent("NGUYEN VIET ANH");
+            const rawDescription = `ThuyRMart CK HD${orderId}`;
+            const description = encodeURIComponent(rawDescription);
+            const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-qr_only.png?amount=${amount}&addInfo=${description}&accountName=${accountName}`;
             document.getElementById('qr-image').src = qrUrl;
+            document.getElementById('qr-memo').textContent = rawDescription;
             
             document.getElementById('discount-msg').style.display = 'none';
             document.getElementById('discount-code').value = '';
             
+            // Show modal
             document.getElementById('payment-qr-modal').style.display = 'flex';
+
+            // Start auto polling checking payment
+            if (paymentPollInterval) clearInterval(paymentPollInterval);
+            paymentPollInterval = setInterval(async () => {
+                try {
+                    const res = await fetch(`/api/sales/${orderId}`);
+                    const order = await res.json();
+                    if (order && order.paid_amount >= order.final_amount) {
+                        clearInterval(paymentPollInterval);
+                        if (modalCountdownInterval) clearInterval(modalCountdownInterval);
+                        alert('Thanh toán thành công! Cảm ơn bạn.');
+                        closePaymentModal();
+                        window.location.reload();
+                    }
+                } catch(e) {
+                    console.error("Polling error", e);
+                }
+            }, 3000);
+
+            // Start countdown timer inside modal (10 minutes)
+            let secondsLeft = 10 * 60;
+            const statusEl = document.getElementById('modal-payment-status');
+            if (modalCountdownInterval) clearInterval(modalCountdownInterval);
+            modalCountdownInterval = setInterval(() => {
+                secondsLeft--;
+                if (secondsLeft <= 0) {
+                    clearInterval(modalCountdownInterval);
+                    if (paymentPollInterval) clearInterval(paymentPollInterval);
+                    statusEl.innerHTML = `<span style="color: var(--error); font-weight:700;">Giao dịch đã hết hạn thanh toán!</span>`;
+                    alert('Phiên thanh toán đã hết hạn.');
+                    closePaymentModal();
+                } else {
+                    const m = Math.floor(secondsLeft / 60);
+                    const s = secondsLeft % 60;
+                    statusEl.innerHTML = `
+                        <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #b45309; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></span>
+                        <span>Đang chờ chuyển khoản tự động (Hết hạn sau ${m}:${s.toString().padStart(2, '0')})...</span>
+                    `;
+                }
+            }, 1000);
         }
 
         function closePaymentModal() {
             document.getElementById('payment-qr-modal').style.display = 'none';
+            if (paymentPollInterval) clearInterval(paymentPollInterval);
+            if (modalCountdownInterval) clearInterval(modalCountdownInterval);
         }
 
         function applyDiscount() {
@@ -483,25 +552,14 @@
                 document.getElementById('discount-msg').textContent = `Đã áp dụng giảm giá 10% (${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(discount)})`;
                 
                 // Update QR with new amount
-                const qrUrl = `https://img.vietqr.io/image/970436-0987654321-compact.png?amount=${newAmount}&addInfo=Thanh toan don hang ${currentPayingOrderId.substring(0, 8).toUpperCase()}&accountName=THUYR MART`;
+                const accountNo = "8871414053";
+                const accountName = encodeURIComponent("NGUYEN VIET ANH");
+                const rawDescription = `ThuyRMart CK HD${currentPayingOrderId}`;
+                const description = encodeURIComponent(rawDescription);
+                const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-qr_only.png?amount=${newAmount}&addInfo=${description}&accountName=${accountName}`;
                 document.getElementById('qr-image').src = qrUrl;
             }
         }
-
-        document.getElementById('btn-confirm-payment').addEventListener('click', async () => {
-            try {
-                const res = await fetch(`/api/sales/${currentPayingOrderId}/pay`, { method: 'PUT' });
-                const data = await res.json();
-                if (data.success) {
-                    alert('Thanh toán thành công! Cảm ơn bạn.');
-                    window.location.reload();
-                } else {
-                    alert('Lỗi: ' + data.error);
-                }
-            } catch (err) {
-                alert('Không thể kết nối đến máy chủ');
-            }
-        });
 
         async function showOrderDetail(id) {
             document.getElementById('order-detail-modal').style.display = 'flex';
