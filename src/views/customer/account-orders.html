@@ -216,9 +216,12 @@
                 <div id="discount-msg" style="font-size: 13px; margin-top: 4px; color: #059669; display: none;">Áp dụng thành công!</div>
             </div>
 
-            <div id="modal-payment-status" style="padding: 12px; background: #fffbeb; border-radius: 8px; border: 1px solid #fef3c7; color: #b45309; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #b45309; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></span>
-                <span>Đang chờ chuyển khoản tự động (Hết hạn sau 10:00)...</span>
+            <div id="modal-payment-status" style="padding: 12px; background: #fffbeb; border-radius: 8px; border: 1px solid #fef3c7; color: #b45309; font-size: 13px; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="spinner" id="modal-payment-spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #b45309; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></span>
+                    <span id="modal-payment-text">Đang chờ chuyển khoản tự động...</span>
+                </div>
+                <div id="modal-payment-countdown" style="font-size: 12px; color: #b45309; font-weight: 500;">(Hết hạn sau 10:00)</div>
             </div>
         </div>
     </div>
@@ -531,26 +534,36 @@
                     }
                 }, 3000);
 
+                // Reset status modal display
+                document.getElementById('modal-payment-spinner').style.display = 'inline-block';
+                document.getElementById('modal-payment-text').textContent = 'Đang chờ chuyển khoản tự động...';
+                document.getElementById('modal-payment-text').style.color = '#b45309';
+                document.getElementById('modal-payment-countdown').style.display = 'block';
+                document.getElementById('modal-payment-countdown').textContent = '(Hết hạn sau 10:00)';
+
                 // Start countdown timer inside modal (10 minutes)
                 let secondsLeft = 10 * 60;
-                const statusEl = document.getElementById('modal-payment-status');
+                const countdownEl = document.getElementById('modal-payment-countdown');
+                const spinnerEl = document.getElementById('modal-payment-spinner');
+                const textEl = document.getElementById('modal-payment-text');
+                
                 if (modalCountdownInterval) clearInterval(modalCountdownInterval);
                 modalCountdownInterval = setInterval(() => {
                     secondsLeft--;
                     if (secondsLeft <= 0) {
                         clearInterval(modalCountdownInterval);
                         if (paymentPollInterval) clearInterval(paymentPollInterval);
-                        statusEl.innerHTML = `<span style="color: var(--error); font-weight:700;">Giao dịch đã hết hạn thanh toán!</span>`;
+                        spinnerEl.style.display = 'none';
+                        countdownEl.style.display = 'none';
+                        textEl.textContent = 'Giao dịch đã hết hạn thanh toán!';
+                        textEl.style.color = 'var(--error)';
                         alert('Phiên thanh toán đã hết hạn.');
                         closePaymentModal();
                         window.location.reload();
                     } else {
                         const m = Math.floor(secondsLeft / 60);
                         const s = secondsLeft % 60;
-                        statusEl.innerHTML = `
-                            <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #b45309; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></span>
-                            <span>Đang chờ chuyển khoản tự động (Hết hạn sau ${m}:${s.toString().padStart(2, '0')})...</span>
-                        `;
+                        countdownEl.textContent = `(Hết hạn sau ${m}:${s.toString().padStart(2, '0')})`;
                     }
                 }, 1000);
                 
