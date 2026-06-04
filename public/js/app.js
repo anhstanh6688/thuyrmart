@@ -859,14 +859,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const categories = await (await fetch('/api/categories')).json();
                 showModal('Chỉnh sửa sản phẩm', `
                     <form>
-                        <div class="mb-3"><label>Tên sản phẩm</label><input type="text" name="name" class="form-control" value="${product.name}" required></div>
-                        <div class="mb-3"><label>Danh mục</label>
-                            <select name="category_id" class="form-control">
-                                ${categories.map(c => `<option value="${c.id}" ${c.id == product.category_id ? 'selected' : ''}>${c.name}</option>`).join('')}
-                            </select>
+                        <div class="form-row">
+                            <div class="mb-3"><label>Tên sản phẩm</label><input type="text" name="name" class="form-control" value="${product.name}" required></div>
+                            <div class="mb-3"><label>Mã SKU</label><input type="text" name="sku" class="form-control" value="${product.sku}" required></div>
                         </div>
-                        <div class="mb-3"><label>Mã SKU</label><input type="text" name="sku" class="form-control" value="${product.sku}" required></div>
-                        
+
+                        <div class="form-row">
+                            <div class="mb-3"><label>Danh mục</label>
+                                <select name="category_id" class="form-control">
+                                    ${categories.map(c => `<option value="${c.id}" ${c.id == product.category_id ? 'selected' : ''}>${c.name}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="mb-3"><label>Đơn vị tính</label><input type="text" name="unit" class="form-control" value="${product.unit || ''}"></div>
+                        </div>
+
                         <div class="form-row">
                             <div class="mb-3">
                                 <label>Giá nhập (Gần nhất)</label>
@@ -876,17 +882,25 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <label>Giá bán (Hiện tại)</label>
                                 <input type="number" name="selling_price" class="form-control" value="${product.selling_price}" required style="font-weight: 800; color: var(--primary-color);">
                             </div>
+                            <div class="mb-3">
+                                <label>Tồn tối thiểu</label>
+                                <input type="number" name="min_stock" class="form-control" value="${product.min_stock || 10}">
+                            </div>
                         </div>
 
-                        <div class="mb-3"><label>Đơn vị tính</label><input type="text" name="unit" class="form-control" value="${product.unit || ''}"></div>
-                        <div class="mb-3">
-                            <label>Hình ảnh mới (Tối đa 4 ảnh, để trống nếu không đổi)</label>
-                            <input type="file" name="image_files" id="edit-product-images" class="form-control" multiple accept="image/*">
-                            <div style="font-size: 0.8rem; color: #666; margin-top: 5px;">Đã có ${product.images ? product.images.length : 0} ảnh</div>
+                        <div class="form-row">
+                            <div class="mb-3">
+                                <label>Hình ảnh mới (Tối đa 4 ảnh, để trống nếu không đổi)</label>
+                                <input type="file" name="image_files" id="edit-product-images" class="form-control" multiple accept="image/*">
+                                <div style="font-size: 0.8rem; color: #666; margin-top: 5px;">Đã có ${product.images ? product.images.length : 0} ảnh</div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Link Video (YouTube/TikTok...)</label>
+                                <input type="url" name="video" class="form-control" value="${product.video || ''}" placeholder="https://youtube.com/...">
+                            </div>
                         </div>
-                        <div class="mb-3"><label>Link Video (YouTube/TikTok...)</label><input type="url" name="video" class="form-control" value="${product.video || ''}" placeholder="https://youtube.com/..."></div>
-                        <div class="mb-3"><label>Tồn tối thiểu</label><input type="number" name="min_stock" class="form-control" value="${product.min_stock || 10}"></div>
-                        <div class="mb-3"><label>Mô tả chi tiết</label><textarea name="description" class="form-control" rows="4" placeholder="Nhập mô tả sản phẩm để hiển thị trên trang khách hàng...">${product.description || ''}</textarea></div>
+
+                        <div class="mb-3"><label>Mô tả chi tiết</label><textarea name="description" class="form-control" rows="3" placeholder="Nhập mô tả sản phẩm để hiển thị trên trang khách hàng...">${product.description || ''}</textarea></div>
                         <button type="submit" class="btn btn-primary btn-block">CẬP NHẬT THÔNG TIN</button>
                     </form>
                 `, async (data, form) => {
@@ -921,7 +935,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (res.ok) { loadProducts(); return true; }
                         else { alert('Lỗi cập nhật'); return false; }
                     } catch(e) { console.error(e); alert('Lỗi hệ thống'); return false; }
-                });
+                }, 'modal-lg');
                 break;
             case 'categories':
                 const category = await (await fetch(`/api/categories/${id}`)).json();
@@ -1103,25 +1117,32 @@ document.addEventListener('DOMContentLoaded', () => {
             const categories = await (await fetch('/api/categories')).json();
             showModal('Thêm sản phẩm mới', `
                 <form id="product-form">
-                    <div class="mb-3"><label>Tên sản phẩm</label><input type="text" name="name" class="form-control" required placeholder="Nhập tên sản phẩm..."></div>
-                    <div class="mb-3"><label>Danh mục</label>
-                        <select name="category_id" class="form-control">
-                            ${categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
-                        </select>
+                    <div class="form-row">
+                        <div class="mb-3"><label>Tên sản phẩm</label><input type="text" name="name" class="form-control" required placeholder="Nhập tên sản phẩm..."></div>
+                        <div class="mb-3"><label>Mã SKU</label><input type="text" name="sku" class="form-control" required placeholder="Gõ mã hoặc dùng máy quét..."></div>
                     </div>
-                    <div class="mb-3"><label>Mã SKU</label><input type="text" name="sku" class="form-control" required placeholder="Gõ mã hoặc dùng máy quét..."></div>
                     
+                    <div class="form-row">
+                        <div class="mb-3"><label>Danh mục</label>
+                            <select name="category_id" class="form-control">
+                                ${categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="mb-3"><label>Đơn vị tính</label><input type="text" name="unit" class="form-control" value="Cái"></div>
+                    </div>
+
                     <div class="form-row">
                         <div class="mb-3"><label>Giá nhập (Ước tính)</label><input type="number" name="cost_price" class="form-control" value="0"></div>
                         <div class="mb-3"><label>Giá bán (Niêm yết)</label><input type="number" name="selling_price" class="form-control" required placeholder="0"></div>
+                        <div class="mb-3"><label>Tồn kho ban đầu</label><input type="number" name="stock_quantity" class="form-control" value="0"></div>
                     </div>
 
-                    <div class="mb-3"><label>Hình ảnh (Tối đa 4 ảnh)</label><input type="file" name="image_files" id="product-images" class="form-control" multiple accept="image/*"></div>
-                    <div class="mb-3"><label>Link Video (YouTube/TikTok...)</label><input type="url" name="video" class="form-control" placeholder="https://youtube.com/..."></div>
+                    <div class="form-row">
+                        <div class="mb-3"><label>Hình ảnh (Tối đa 4 ảnh)</label><input type="file" name="image_files" id="product-images" class="form-control" multiple accept="image/*"></div>
+                        <div class="mb-3"><label>Link Video (YouTube/TikTok...)</label><input type="url" name="video" class="form-control" placeholder="https://youtube.com/..."></div>
+                    </div>
 
-                    <div class="mb-3"><label>Đơn vị tính</label><input type="text" name="unit" class="form-control" value="Cái"></div>
-                    <div class="mb-3"><label>Tồn kho ban đầu</label><input type="number" name="stock_quantity" class="form-control" value="0"></div>
-                    <div class="mb-3"><label>Mô tả chi tiết</label><textarea name="description" class="form-control" rows="4" placeholder="Nhập mô tả sản phẩm để hiển thị trên trang khách hàng..."></textarea></div>
+                    <div class="mb-3"><label>Mô tả chi tiết</label><textarea name="description" class="form-control" rows="3" placeholder="Nhập mô tả sản phẩm để hiển thị trên trang khách hàng..."></textarea></div>
                     <button type="submit" class="btn btn-primary btn-block">LƯU SẢN PHẨM MỚI</button>
                 </form>
             `, async (data, form) => {
@@ -1154,7 +1175,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (res.ok) { alert('Thành công!'); loadProducts(); return true; }
                     else { alert('Lỗi khi lưu sản phẩm'); return false; }
                 } catch(e) { console.error(e); alert('Lỗi hệ thống'); return false; }
-            });
+            }, 'modal-lg');
         };
     }
 

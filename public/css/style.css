@@ -57,6 +57,10 @@
     box-sizing: border-box;
 }
 
+button, input, select, textarea {
+    font-family: inherit;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-color);
@@ -751,7 +755,7 @@ tr[style*="fffbeb"] td { border-bottom-color: #fde68a !important; }
 .po-total-display { background: #f8fafc; padding: 24px; border-radius: 16px; margin-top: 24px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); }
 .po-total-label { font-size: 14px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 .po-total-value { font-size: 28px; font-weight: 900; color: var(--primary-color); }
-.checkout-btn { width: 100%; padding: 18px; background: var(--primary-gradient); color: white; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 20px -5px rgba(234, 88, 12, 0.4); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.checkout-btn { width: 100%; padding: 18px; background: var(--primary-gradient); color: white; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 20px -5px rgba(234, 88, 12, 0.4); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-family: inherit; }
 .checkout-btn:hover { transform: translateY(-4px); box-shadow: 0 15px 30px -5px rgba(234, 88, 12, 0.5); }
 .pos-table-container { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 24px; border: 1px solid var(--border-color); }
 .pos-table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
