@@ -270,6 +270,10 @@
                   >0đ</strong
                 >
               </div>
+              <div style="margin-top: 6px; display: flex; align-items: center; gap: 8px;">
+                Nội dung: <strong id="transfer-box-memo" style="color: #b45309;">Loading...</strong>
+                <button onclick="navigator.clipboard.writeText(document.getElementById('transfer-box-memo').textContent); alert('Đã sao chép nội dung chuyển khoản!')" style="padding: 2px 6px; font-size: 11px; background: #e2e8f0; border: none; border-radius: 4px; cursor: pointer; color: #1f2937;">Sao chép</button>
+              </div>
             </div>
             <button
               id="btn-simulate-pay"
@@ -472,13 +476,13 @@
                 document.getElementById("transfer-box-amount").textContent =
                   formatVND(order.final_amount);
 
-                const accountNo = "8871414053";
+                 const accountNo = "8871414053";
                 const accountName = encodeURIComponent("NGUYEN VIET ANH");
-                const description = encodeURIComponent(
-                  `ThuyRMart CK HD${order.id}`,
-                );
+                const rawDescription = `ThuyRMart CK HD${order.id}`;
+                const description = encodeURIComponent(rawDescription);
                 const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-qr_only.png?amount=${order.final_amount}&addInfo=${description}&accountName=${accountName}`;
                 document.getElementById("transfer-box-qr").src = qrUrl;
+                document.getElementById("transfer-box-memo").textContent = rawDescription;
 
                 // Hide simulation button if in production
                 if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
