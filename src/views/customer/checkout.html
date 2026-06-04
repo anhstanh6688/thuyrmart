@@ -93,9 +93,9 @@
                             <div style="display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
                                 <div style="flex: 1; min-width: 200px;">
                                     <p style="margin-bottom: 8px; color: #166534;"><strong>Thông tin chuyển khoản:</strong></p>
-                                    <p style="margin-bottom: 4px; color: #15803d;">Ngân hàng: <strong>Vietinbank</strong></p>
-                                    <p style="margin-bottom: 4px; color: #15803d;">Số tài khoản: <strong>103877087416</strong></p>
-                                    <p style="margin-bottom: 4px; color: #15803d;">Chủ tài khoản: <strong>Do Thi Thuy</strong></p>
+                                    <p style="margin-bottom: 4px; color: #15803d;">Ngân hàng: <strong>BIDV</strong></p>
+                                    <p style="margin-bottom: 4px; color: #15803d;">Số tài khoản: <strong>8871414053</strong></p>
+                                    <p style="margin-bottom: 4px; color: #15803d;">Chủ tài khoản: <strong>NGUYEN VIET ANH</strong></p>
                                     <p style="margin-bottom: 0; color: #15803d;">Số tiền: <strong id="transfer-amount" style="font-size: 15px; color: var(--primary);">0đ</strong></p>
                                     <p style="margin-top: 8px; color: #166534; font-size: 13px;"><em>Hệ thống sẽ ghi nhận đã thanh toán trước khi giao hàng.</em></p>
                                 </div>
@@ -156,10 +156,10 @@
                 
                 document.getElementById('transfer-amount').textContent = formatVND(subtotal);
                 
-                const accountNo = "103877087416";
-                const accountName = encodeURIComponent("Do Thi Thuy");
+                const accountNo = "8871414053";
+                const accountName = encodeURIComponent("NGUYEN VIET ANH");
                 const description = encodeURIComponent("ThuyRMart CK mua hang");
-                const qrUrl = `https://img.vietqr.io/image/vietinbank-${accountNo}-qr_only.png?amount=${subtotal}&addInfo=${description}&accountName=${accountName}`;
+                const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-qr_only.png?amount=${subtotal}&addInfo=${description}&accountName=${accountName}`;
                 
                 document.getElementById('transfer-qr').src = qrUrl;
             } else {

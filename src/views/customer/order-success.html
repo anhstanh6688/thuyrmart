@@ -256,13 +256,13 @@
               "
             >
               <div style="margin-bottom: 4px">
-                Ngân hàng: <strong>Vietinbank</strong>
+                Ngân hàng: <strong>BIDV</strong>
               </div>
               <div style="margin-bottom: 4px">
-                Số tài khoản: <strong>103877087416</strong>
+                Số tài khoản: <strong>8871414053</strong>
               </div>
               <div style="margin-bottom: 4px">
-                Chủ tài khoản: <strong>Do Thi Thuy</strong>
+                Chủ tài khoản: <strong>NGUYEN VIET ANH</strong>
               </div>
               <div>
                 Số tiền:
@@ -472,13 +472,19 @@
                 document.getElementById("transfer-box-amount").textContent =
                   formatVND(order.final_amount);
 
-                const accountNo = "103877087416";
-                const accountName = encodeURIComponent("Do Thi Thuy");
+                const accountNo = "8871414053";
+                const accountName = encodeURIComponent("NGUYEN VIET ANH");
                 const description = encodeURIComponent(
                   `ThuyRMart CK HD${order.id}`,
                 );
-                const qrUrl = `https://img.vietqr.io/image/vietinbank-${accountNo}-qr_only.png?amount=${order.final_amount}&addInfo=${description}&accountName=${accountName}`;
+                const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-qr_only.png?amount=${order.final_amount}&addInfo=${description}&accountName=${accountName}`;
                 document.getElementById("transfer-box-qr").src = qrUrl;
+
+                // Hide simulation button if in production
+                if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+                  const simulateBtn = document.getElementById("btn-simulate-pay");
+                  if (simulateBtn) simulateBtn.style.display = "none";
+                }
 
                 if (order.paid_amount >= order.final_amount) {
                   showPaidState();

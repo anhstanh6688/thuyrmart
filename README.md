@@ -301,10 +301,26 @@ thuyrmart/
    CLOUDINARY_CLOUD_NAME=<your_cloud_name>
    CLOUDINARY_API_KEY=<your_cloudinary_api_key>
    CLOUDINARY_API_SECRET=<your_cloudinary_secret>
+   PAYMENT_WEBHOOK_TOKEN=<chuỗi_bảo_mật_tùy_chọn>
    ```
 5. **Deploy!** → Render tự động build và deploy
 
 > ⚠️ **Lưu ý**: Free tier sẽ sleep sau 15 phút idle. Dùng [UptimeRobot](https://uptimerobot.com) để ping mỗi 10 phút.
+
+---
+
+## 💳 Cấu hình nhận diện chuyển khoản tự động
+
+Hệ thống hỗ trợ tự động nhận diện giao dịch chuyển tiền qua Webhook từ cổng **SePay.vn** hoặc **Casso.vn** đến tài khoản ngân hàng của bạn.
+
+### Các bước cấu hình:
+1. Đăng ký tài khoản miễn phí trên **SePay.vn** hoặc **Casso.vn**.
+2. Liên kết tài khoản ngân hàng nhận tiền của bạn.
+3. Tạo một Webhook mới trên dashboard của dịch vụ đó:
+   - **URL Webhook**: `https://<ten-app-cua-ban>.onrender.com/api/sales/webhook`
+   - **Kiểu Request**: `POST`
+   - **Authorization** (Header): Điền token bảo mật khớp với biến `PAYMENT_WEBHOOK_TOKEN` trong biến môi trường Render (nếu có sử dụng).
+4. Thực hiện thử một giao dịch chuyển khoản với nội dung chuyển tiền chứa mã đơn hàng (được hiển thị tự động dạng VietQR khi thanh toán). Hệ thống sẽ tự động đối soát và cập nhật trạng thái "Đã thanh toán" trong vòng 3 giây!
 
 ---
 

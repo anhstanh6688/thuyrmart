@@ -10,5 +10,6 @@ router.put('/:id/cancel', saleController.cancelSale);
 router.put('/:id/pay', saleController.paySale);
 router.put('/:id/status', saleController.updateStatus);
 router.put('/:id/mock-pay', saleController.mockPaymentSuccess);
+router.post('/webhook', saleController.bankTransferWebhook);
 
 module.exports = router;
