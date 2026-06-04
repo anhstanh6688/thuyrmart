@@ -73,6 +73,12 @@ exports.updateStatus = async (req, res) => {
     }
 };
 
+let webhookLogs = [];
+
+exports.getWebhookLogs = (req, res) => {
+    res.json(webhookLogs);
+};
+
 exports.mockPaymentSuccess = async (req, res) => {
     try {
         const sale = await Sale.getById(req.params.id);
@@ -92,6 +98,14 @@ exports.bankTransferWebhook = async (req, res) => {
         console.log('--- Received Bank Transfer Webhook ---');
         console.log('Headers:', JSON.stringify(req.headers));
         console.log('Body:', JSON.stringify(req.body));
+        
+        // Save to global logs for debugging
+        webhookLogs.unshift({
+            timestamp: new Date().toISOString(),
+            headers: req.headers,
+            body: req.body
+        });
+        if (webhookLogs.length > 20) webhookLogs.pop();
         
         // 1. Verify Secure Token (Optional)
         const authorizationHeader = req.headers['authorization'];
