@@ -76,7 +76,7 @@
         <div class="container">
             <div class="account-layout">
                 <!-- Sidebar -->
-                <aside class="account-sidebar">
+                <aside class="account-sidebar" style="margin-top: 68px;">
                     <div style="margin-bottom: 24px;">
                         <h2 style="font-size: 18px; font-weight: 700; color: var(--on-surface); margin-bottom: 4px;">Tài khoản của tôi</h2>
                         <p style="font-size: 13px; color: var(--on-surface-variant);">Quản lý thông tin và đơn hàng</p>
@@ -457,6 +457,22 @@
                 if (isCancelled) { statusClass = 'cancelled'; statusTextHtml = 'Đã hủy'; }
                 if (isExpired) { statusClass = 'cancelled'; statusTextHtml = 'Hết hạn'; }
 
+                let inlineStyle = '';
+                let dotStyle = '';
+                if (isPending) {
+                    inlineStyle = 'background:#fef3c7; color:#d97706; border-color:#fde68a;';
+                    dotStyle = 'background:#d97706;';
+                } else if (isDelivering) {
+                    inlineStyle = 'background:#e0e7ff; color:#4338ca; border-color:#c7d2fe;';
+                    dotStyle = 'background:#4338ca;';
+                } else if (isExpired || isCancelled) {
+                    inlineStyle = 'background:#fee2e2; color:#b91c1c; border-color:#fecaca;';
+                    dotStyle = 'background:#b91c1c;';
+                } else { // Completed
+                    inlineStyle = 'background:#dcfce7; color:#15803d; border-color:#bbf7d0;';
+                    dotStyle = 'background:#15803d;';
+                }
+
                 const date = new Date(order.order_date).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' });
                 
                 let actionHtml = `<a href="#" onclick="showOrderDetail('${order.id}'); return false;" class="order-action-link">Xem chi tiết</a>`;
@@ -472,8 +488,8 @@
                         <td style="font-weight: 600;">#${order.id.substring(0, 8).toUpperCase()}</td>
                         <td style="color: var(--on-surface-variant);">${date}</td>
                         <td>
-                            <div class="status-badge ${statusClass}" style="${isPending ? 'background:#fef3c7; color:#d97706;' : isDelivering ? 'background:#e0e7ff; color:#4338ca;' : isExpired ? 'background:#fee2e2; color:#b91c1c;' : ''}">
-                                <div class="dot" style="${isPending ? 'background:#d97706;' : isDelivering ? 'background:#4338ca;' : isExpired ? 'background:#b91c1c;' : ''}"></div> ${statusTextHtml}
+                            <div class="status-badge ${statusClass}" style="${inlineStyle}">
+                                <div class="dot" style="${dotStyle}"></div> ${statusTextHtml}
                             </div>
                         </td>
                         <td style="font-weight: 600; ${(isCancelled || isExpired) ? 'color: var(--on-surface-variant); text-decoration: line-through;' : ''}">${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.final_amount)}</td>
