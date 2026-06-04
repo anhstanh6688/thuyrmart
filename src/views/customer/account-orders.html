@@ -199,7 +199,7 @@
                     <div id="qr-amount" style="font-size: 24px; font-weight: 800; color: var(--primary);">0 đ</div>
                     <div id="qr-order-id" style="font-size: 13px; color: var(--on-surface-variant); margin-top: 4px;"></div>
                     <!-- Plain text memo for easy copying -->
-                    <div style="margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;">
+                    <div id="qr-memo-container" style="margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;">
                         <span>Nội dung:</span> <strong id="qr-memo" style="color: #b45309;">Loading...</strong>
                         <button onclick="navigator.clipboard.writeText(document.getElementById('qr-memo').textContent); alert('Đã sao chép nội dung chuyển khoản!')" style="padding: 2px 6px; font-size: 11px; background: #e2e8f0; border: none; border-radius: 4px; cursor: pointer; color: #1f2937;">Sao chép</button>
                     </div>
@@ -208,12 +208,22 @@
 
             <!-- Discount Section -->
             <div style="text-align: left; margin-bottom: 24px;">
-                <label style="font-size: 13px; font-weight: 600; color: var(--on-surface); display: block; margin-bottom: 8px;">Mã giảm giá (Nếu có)</label>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" id="discount-code" placeholder="Nhập mã..." style="flex: 1; padding: 10px; border: 1px solid var(--outline-variant); border-radius: 6px; font-size: 14px;">
-                    <button type="button" onclick="applyDiscount()" style="padding: 0 16px; background: var(--surface-container-high); border: 1px solid var(--outline-variant); border-radius: 6px; font-weight: 600; cursor: pointer;">Áp dụng</button>
+                <label style="font-size: 13px; font-weight: 600; color: var(--on-surface); display: block; margin-bottom: 8px;">Chọn mã giảm giá demo (100% OFF)</label>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;" id="discount-choices">
+                    <button type="button" onclick="selectDiscountCode('DEMO100')" class="discount-choice-btn" data-code="DEMO100" style="padding: 10px 4px; border: 1.5px dashed #059669; border-radius: 8px; background: #ecfdf5; color: #065f46; cursor: pointer; text-align: center; transition: all 0.2s; font-weight: 700; font-family: 'Inter', sans-serif; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <span>DEMO100</span>
+                        <span style="font-size: 10px; font-weight: 500; opacity: 0.8;">Demo 100%</span>
+                    </button>
+                    <button type="button" onclick="selectDiscountCode('FREE100')" class="discount-choice-btn" data-code="FREE100" style="padding: 10px 4px; border: 1.5px dashed #059669; border-radius: 8px; background: #ecfdf5; color: #065f46; cursor: pointer; text-align: center; transition: all 0.2s; font-weight: 700; font-family: 'Inter', sans-serif; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <span>FREE100</span>
+                        <span style="font-size: 10px; font-weight: 500; opacity: 0.8;">Miễn phí</span>
+                    </button>
+                    <button type="button" onclick="selectDiscountCode('THUYRMART100')" class="discount-choice-btn" data-code="THUYRMART100" style="padding: 10px 4px; border: 1.5px dashed #059669; border-radius: 8px; background: #ecfdf5; color: #065f46; cursor: pointer; text-align: center; transition: all 0.2s; font-weight: 700; font-family: 'Inter', sans-serif; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <span>THUYRMART100</span>
+                        <span style="font-size: 10px; font-weight: 500; opacity: 0.8;">Giảm 100%</span>
+                    </button>
                 </div>
-                <div id="discount-msg" style="font-size: 13px; margin-top: 4px; color: #059669; display: none;">Áp dụng thành công!</div>
+                <div id="discount-msg" style="font-size: 13px; margin-top: 8px; color: #059669; display: none; font-weight: 600;">Áp dụng thành công!</div>
             </div>
 
             <div id="modal-payment-status" style="padding: 12px; background: #fffbeb; border-radius: 8px; border: 1px solid #fef3c7; color: #b45309; font-size: 13px; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;">
@@ -226,7 +236,7 @@
 
             <!-- Zero Payment / Direct Pay Container for Demo -->
             <div id="zero-payment-container" style="display: none; margin-top: 16px;">
-                <button type="button" onclick="confirmZeroPayment()" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; background: #059669; border: none; color: white; cursor: pointer; font-size: 14px; transition: background 0.2s;">Xác nhận thanh toán ngay (Miễn phí 100%)</button>
+                <button type="button" onclick="confirmZeroPayment()" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; background: #059669; border: none; color: white; cursor: pointer; font-size: 14px; transition: background 0.2s;">Thanh toán ngay</button>
             </div>
 
             <!-- Test Simulation Button -->
@@ -532,8 +542,24 @@
                 document.getElementById('qr-image').src = qrUrl;
                 document.getElementById('qr-memo').textContent = rawDescription;
                 
+                // Reset active discount code and buttons UI
+                activeDiscountCode = null;
+                const discountBtns = document.querySelectorAll('.discount-choice-btn');
+                discountBtns.forEach(btn => {
+                    btn.style.border = '1.5px dashed #059669';
+                    btn.style.background = '#ecfdf5';
+                    btn.style.opacity = '1';
+                });
+                
                 document.getElementById('discount-msg').style.display = 'none';
-                document.getElementById('discount-code').value = '';
+                
+                // Reset elements style modified by discount
+                document.getElementById('qr-image').style.display = 'block';
+                document.getElementById('qr-image').style.opacity = '1';
+                const memoContainer = document.getElementById('qr-memo-container');
+                if (memoContainer) memoContainer.style.display = 'flex';
+                document.getElementById('modal-payment-status').style.display = 'flex';
+                document.getElementById('zero-payment-container').style.display = 'none';
                 
                 // Show modal
                 document.getElementById('payment-qr-modal').style.display = 'flex';
@@ -603,7 +629,10 @@
             if (modalCountdownInterval) clearInterval(modalCountdownInterval);
             
             // Reset elements style modified by discount
+            document.getElementById('qr-image').style.display = 'block';
             document.getElementById('qr-image').style.opacity = '1';
+            const memoContainer = document.getElementById('qr-memo-container');
+            if (memoContainer) memoContainer.style.display = 'flex';
             document.getElementById('modal-payment-status').style.display = 'flex';
             document.getElementById('zero-payment-container').style.display = 'none';
         }
@@ -636,8 +665,10 @@
                 
                 if (res.ok && data.success) {
                     alert('Thanh toán đơn hàng thành công!');
-                    closePaymentModal();
-                    window.location.reload();
+                    setTimeout(() => {
+                        closePaymentModal();
+                        window.location.reload();
+                    }, 1500);
                 } else {
                     alert('Lỗi khi hoàn tất đơn hàng: ' + (data.error || 'Lỗi không xác định'));
                 }
@@ -649,53 +680,70 @@
             }
         }
 
-        function applyDiscount() {
-            const code = document.getElementById('discount-code').value.trim().toUpperCase();
-            if (!code) return;
+        let activeDiscountCode = null;
+
+        function selectDiscountCode(code) {
+            const btns = document.querySelectorAll('.discount-choice-btn');
             
-            // Check for 100% discount codes
-            if (code === 'DEMO100' || code === 'FREE100' || code === 'THUYRMART100') {
-                // Apply 100% discount
-                document.getElementById('qr-amount').innerHTML = `
-                    <span style="text-decoration: line-through; color: var(--on-surface-variant); font-size: 14px;">${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentPayingAmount)}</span>
-                    <br>0 đ
-                `;
-                document.getElementById('discount-msg').style.display = 'block';
-                document.getElementById('discount-msg').textContent = `Áp dụng thành công mã giảm giá 100%!`;
-                document.getElementById('discount-msg').style.color = '#059669';
+            // If clicking the already selected coupon, toggle it off
+            if (activeDiscountCode === code) {
+                activeDiscountCode = null;
+                btns.forEach(btn => {
+                    btn.style.border = '1.5px dashed #059669';
+                    btn.style.background = '#ecfdf5';
+                    btn.style.opacity = '1';
+                });
                 
-                // Hide/blur QR code and timer elements to avoid confusion since it is now free
-                document.getElementById('qr-image').style.opacity = '0.3';
-                document.getElementById('modal-payment-status').style.display = 'none';
+                // Restore original state
+                document.getElementById('qr-amount').textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentPayingAmount);
+                document.getElementById('qr-image').style.display = 'block';
+                document.getElementById('qr-image').style.opacity = '1';
+                const memoContainer = document.getElementById('qr-memo-container');
+                if (memoContainer) memoContainer.style.display = 'flex';
+                document.getElementById('discount-msg').style.display = 'none';
+                document.getElementById('zero-payment-container').style.display = 'none';
                 
-                // Show Zero Payment button
-                document.getElementById('zero-payment-container').style.display = 'block';
-                
-                // Stop polling and stop countdown
-                if (paymentPollInterval) clearInterval(paymentPollInterval);
-                if (modalCountdownInterval) clearInterval(modalCountdownInterval);
-                
+                // Restart timer/polling
+                openPaymentModal(currentPayingOrderId, currentPayingAmount);
                 return;
             }
             
-            // Normal code: mockup 10% off
-            const discount = currentPayingAmount * 0.1;
-            const newAmount = currentPayingAmount - discount;
+            activeDiscountCode = code;
+            
+            // Highlight selected button, dim others
+            btns.forEach(btn => {
+                if (btn.getAttribute('data-code') === code) {
+                    btn.style.border = '2.5px solid #047857';
+                    btn.style.background = '#d1fae5';
+                    btn.style.opacity = '1';
+                } else {
+                    btn.style.border = '1px solid #e2e8f0';
+                    btn.style.background = '#f8fafc';
+                    btn.style.opacity = '0.5';
+                }
+            });
+            
+            // Apply 100% discount
             document.getElementById('qr-amount').innerHTML = `
                 <span style="text-decoration: line-through; color: var(--on-surface-variant); font-size: 14px;">${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentPayingAmount)}</span>
-                <br>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(newAmount)}
+                <br>0 đ
             `;
             document.getElementById('discount-msg').style.display = 'block';
-            document.getElementById('discount-msg').textContent = `Đã áp dụng giảm giá 10% (${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(discount)})`;
+            document.getElementById('discount-msg').textContent = `Áp dụng thành công mã giảm giá ${code}!`;
             document.getElementById('discount-msg').style.color = '#059669';
             
-            // Update QR with new amount
-            const accountNo = "8871414053";
-            const accountName = encodeURIComponent("NGUYEN VIET ANH");
-            const rawDescription = `ThuyRMart CK HD${currentPayingOrderId}`;
-            const description = encodeURIComponent(rawDescription);
-            const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-compact.png?amount=${newAmount}&addInfo=${description}&accountName=${accountName}`;
-            document.getElementById('qr-image').src = qrUrl;
+            // Hide QR code and timer elements to avoid confusion since it is now free
+            document.getElementById('qr-image').style.display = 'none';
+            const memoContainer = document.getElementById('qr-memo-container');
+            if (memoContainer) memoContainer.style.display = 'none';
+            document.getElementById('modal-payment-status').style.display = 'none';
+            
+            // Show Zero Payment button
+            document.getElementById('zero-payment-container').style.display = 'block';
+            
+            // Stop polling and stop countdown
+            if (paymentPollInterval) clearInterval(paymentPollInterval);
+            if (modalCountdownInterval) clearInterval(modalCountdownInterval);
         }
 
         async function showOrderDetail(id) {
