@@ -467,69 +467,99 @@
         let paymentPollInterval = null;
         let modalCountdownInterval = null;
 
-        function openPaymentModal(orderId, amount) {
-            currentPayingOrderId = orderId;
-            currentPayingAmount = amount;
+        async function openPaymentModal(orderId, amount) {
+            // Disable all action buttons on the page to prevent double submission
+            const payBtns = document.querySelectorAll(`button[onclick^="openPaymentModal"]`);
+            payBtns.forEach(btn => btn.disabled = true);
             
-            // Format money
-            const formattedAmount = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-            document.getElementById('qr-amount').textContent = formattedAmount;
-            document.getElementById('qr-order-id').textContent = `Mã đơn: #${orderId.substring(0, 8).toUpperCase()}`;
-            
-            // Generate BIDV VietQR code
-            const accountNo = "8871414053";
-            const accountName = encodeURIComponent("NGUYEN VIET ANH");
-            const rawDescription = `ThuyRMart CK HD${orderId}`;
-            const description = encodeURIComponent(rawDescription);
-            const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-qr_only.png?amount=${amount}&addInfo=${description}&accountName=${accountName}`;
-            document.getElementById('qr-image').src = qrUrl;
-            document.getElementById('qr-memo').textContent = rawDescription;
-            
-            document.getElementById('discount-msg').style.display = 'none';
-            document.getElementById('discount-code').value = '';
-            
-            // Show modal
-            document.getElementById('payment-qr-modal').style.display = 'flex';
+            try {
+                // Call the API to renew/restart the timer
+                const renewRes = await fetch(`/api/sales/${orderId}/renew-timer`, { method: 'PUT' });
+                const renewData = await renewRes.json();
+                
+                if (!renewRes.ok || !renewData.success) {
+                    alert('Lỗi gia hạn thanh toán: ' + (renewData.error || 'Lỗi không xác định'));
+                    return;
+                }
+                
+                // Update the order in our local allOrders array so the table list updates too
+                const order = allOrders.find(o => o.id === orderId);
+                if (order) {
+                    order.order_date = renewData.order.order_date;
+                    order.status = renewData.order.status;
+                    renderOrdersTable(document.getElementById('filter-status').value);
+                }
+                
+                currentPayingOrderId = orderId;
+                currentPayingAmount = amount;
+                
+                // Format money
+                const formattedAmount = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+                document.getElementById('qr-amount').textContent = formattedAmount;
+                document.getElementById('qr-order-id').textContent = `Mã đơn: #${orderId.substring(0, 8).toUpperCase()}`;
+                
+                // Generate BIDV VietQR code using 'compact' template to show bank and beneficiary info
+                const accountNo = "8871414053";
+                const accountName = encodeURIComponent("NGUYEN VIET ANH");
+                const rawDescription = `ThuyRMart CK HD${orderId}`;
+                const description = encodeURIComponent(rawDescription);
+                const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-compact.png?amount=${amount}&addInfo=${description}&accountName=${accountName}`;
+                document.getElementById('qr-image').src = qrUrl;
+                document.getElementById('qr-memo').textContent = rawDescription;
+                
+                document.getElementById('discount-msg').style.display = 'none';
+                document.getElementById('discount-code').value = '';
+                
+                // Show modal
+                document.getElementById('payment-qr-modal').style.display = 'flex';
 
-            // Start auto polling checking payment
-            if (paymentPollInterval) clearInterval(paymentPollInterval);
-            paymentPollInterval = setInterval(async () => {
-                try {
-                    const res = await fetch(`/api/sales/${orderId}`);
-                    const order = await res.json();
-                    if (order && order.paid_amount >= order.final_amount) {
-                        clearInterval(paymentPollInterval);
-                        if (modalCountdownInterval) clearInterval(modalCountdownInterval);
-                        alert('Thanh toán thành công! Cảm ơn bạn.');
+                // Start auto polling checking payment
+                if (paymentPollInterval) clearInterval(paymentPollInterval);
+                paymentPollInterval = setInterval(async () => {
+                    try {
+                        const res = await fetch(`/api/sales/${orderId}`);
+                        const order = await res.json();
+                        if (order && order.paid_amount >= order.final_amount) {
+                            clearInterval(paymentPollInterval);
+                            if (modalCountdownInterval) clearInterval(modalCountdownInterval);
+                            alert('Thanh toán thành công! Cảm ơn bạn.');
+                            closePaymentModal();
+                            window.location.reload();
+                        }
+                    } catch(e) {
+                        console.error("Polling error", e);
+                    }
+                }, 3000);
+
+                // Start countdown timer inside modal (10 minutes)
+                let secondsLeft = 10 * 60;
+                const statusEl = document.getElementById('modal-payment-status');
+                if (modalCountdownInterval) clearInterval(modalCountdownInterval);
+                modalCountdownInterval = setInterval(() => {
+                    secondsLeft--;
+                    if (secondsLeft <= 0) {
+                        clearInterval(modalCountdownInterval);
+                        if (paymentPollInterval) clearInterval(paymentPollInterval);
+                        statusEl.innerHTML = `<span style="color: var(--error); font-weight:700;">Giao dịch đã hết hạn thanh toán!</span>`;
+                        alert('Phiên thanh toán đã hết hạn.');
                         closePaymentModal();
                         window.location.reload();
+                    } else {
+                        const m = Math.floor(secondsLeft / 60);
+                        const s = secondsLeft % 60;
+                        statusEl.innerHTML = `
+                            <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #b45309; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></span>
+                            <span>Đang chờ chuyển khoản tự động (Hết hạn sau ${m}:${s.toString().padStart(2, '0')})...</span>
+                        `;
                     }
-                } catch(e) {
-                    console.error("Polling error", e);
-                }
-            }, 3000);
-
-            // Start countdown timer inside modal (10 minutes)
-            let secondsLeft = 10 * 60;
-            const statusEl = document.getElementById('modal-payment-status');
-            if (modalCountdownInterval) clearInterval(modalCountdownInterval);
-            modalCountdownInterval = setInterval(() => {
-                secondsLeft--;
-                if (secondsLeft <= 0) {
-                    clearInterval(modalCountdownInterval);
-                    if (paymentPollInterval) clearInterval(paymentPollInterval);
-                    statusEl.innerHTML = `<span style="color: var(--error); font-weight:700;">Giao dịch đã hết hạn thanh toán!</span>`;
-                    alert('Phiên thanh toán đã hết hạn.');
-                    closePaymentModal();
-                } else {
-                    const m = Math.floor(secondsLeft / 60);
-                    const s = secondsLeft % 60;
-                    statusEl.innerHTML = `
-                        <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #b45309; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></span>
-                        <span>Đang chờ chuyển khoản tự động (Hết hạn sau ${m}:${s.toString().padStart(2, '0')})...</span>
-                    `;
-                }
-            }, 1000);
+                }, 1000);
+                
+            } catch (err) {
+                console.error("Payment initialization error:", err);
+                alert("Lỗi kết nối máy chủ khi bắt đầu thanh toán.");
+            } finally {
+                payBtns.forEach(btn => btn.disabled = false);
+            }
         }
 
         function closePaymentModal() {
@@ -556,7 +586,7 @@
                 const accountName = encodeURIComponent("NGUYEN VIET ANH");
                 const rawDescription = `ThuyRMart CK HD${currentPayingOrderId}`;
                 const description = encodeURIComponent(rawDescription);
-                const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-qr_only.png?amount=${newAmount}&addInfo=${description}&accountName=${accountName}`;
+                const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-compact.png?amount=${newAmount}&addInfo=${description}&accountName=${accountName}`;
                 document.getElementById('qr-image').src = qrUrl;
             }
         }

@@ -315,7 +315,7 @@
             <img
               id="transfer-box-qr"
               src=""
-              alt="Mã QR VietinBank"
+              alt="Mã QR BIDV"
               style="max-width: 100%; max-height: 100%; object-fit: contain"
             />
           </div>
@@ -508,7 +508,7 @@
                 const accountName = encodeURIComponent("NGUYEN VIET ANH");
                 const rawDescription = `ThuyRMart CK HD${order.id}`;
                 const description = encodeURIComponent(rawDescription);
-                const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-qr_only.png?amount=${order.final_amount}&addInfo=${description}&accountName=${accountName}`;
+                const qrUrl = `https://img.vietqr.io/image/bidv-${accountNo}-compact.png?amount=${order.final_amount}&addInfo=${description}&accountName=${accountName}`;
                 document.getElementById("transfer-box-qr").src = qrUrl;
                 document.getElementById("transfer-box-memo").textContent = rawDescription;
 

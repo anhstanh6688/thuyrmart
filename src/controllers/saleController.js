@@ -93,6 +93,18 @@ exports.mockPaymentSuccess = async (req, res) => {
     }
 };
 
+exports.renewTimer = async (req, res) => {
+    try {
+        const result = await Sale.renewTimer(req.params.id);
+        if (!result.success) {
+            return res.status(400).json(result);
+        }
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
 exports.bankTransferWebhook = async (req, res) => {
     try {
         console.log('--- Received Bank Transfer Webhook ---');

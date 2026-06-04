@@ -201,6 +201,73 @@ class Sale {
         return false;
     }
 
+    static async renewTimer(id) {
+        if (!mongoose.Types.ObjectId.isValid(id)) return { success: false, error: 'Mã đơn hàng không hợp lệ' };
+        const session = await mongoose.startSession();
+        session.startTransaction();
+        try {
+            const sale = await SaleModel.findById(id).session(session);
+            if (!sale) throw new Error('Không tìm thấy hóa đơn');
+            
+            if (sale.status === 'completed') {
+                throw new Error('Đơn hàng đã thanh toán thành công, không thể gia hạn');
+            }
+            
+            const originalStatus = sale.status;
+            
+            // If it was expired or cancelled, we need to deduct stock again when moving back to pending
+            if (originalStatus === 'expired' || originalStatus === 'cancelled') {
+                const ProductModel = mongoose.model('Product');
+                const InventoryLog = require('./InventoryLog');
+                
+                for (const item of sale.items) {
+                    if (!item.product_id) continue;
+                    const product = await ProductModel.findById(item.product_id).session(session);
+                    if (!product) throw new Error('Sản phẩm trong đơn hàng không tồn tại');
+                    if (product.stock_quantity < item.quantity) {
+                        throw new Error(`Sản phẩm "${product.name}" không đủ tồn kho để gia hạn thanh toán (chỉ còn ${product.stock_quantity})`);
+                    }
+                    
+                    product.stock_quantity -= item.quantity;
+                    await product.save({ session });
+                    
+                    const log = new InventoryLog({
+                        product_id: item.product_id,
+                        type: 'out',
+                        quantity: -item.quantity,
+                        reference_id: sale._id,
+                        note: `Gia hạn thanh toán - Đơn hàng #${sale._id}`
+                    });
+                    await log.save({ session });
+                }
+            }
+            
+            // Update status and createdAt direct to DB to reset timer
+            await SaleModel.collection.updateOne(
+                { _id: sale._id },
+                { $set: { status: 'pending', createdAt: new Date() } },
+                { session }
+            );
+            
+            const updatedSale = await SaleModel.findById(sale._id).session(session);
+            
+            await session.commitTransaction();
+            return {
+                success: true,
+                order: {
+                    id: updatedSale._id.toString(),
+                    status: updatedSale.status,
+                    order_date: updatedSale.createdAt
+                }
+            };
+        } catch (error) {
+            await session.abortTransaction();
+            return { success: false, error: error.message };
+        } finally {
+            session.endSession();
+        }
+    }
+
     static async getAll() {
         const sales = await SaleModel.find()
             .populate('customer_id', 'name')
@@ -234,7 +301,10 @@ class Sale {
         if (!sale) return null;
         
         const isExpired = await Sale.checkExpired(sale);
-        if (isExpired) sale.status = 'expired';
+        if (isExpired) {
+            await Sale.updateStatus(sale._id, 'expired');
+            sale.status = 'expired';
+        }
 
         return {
             id: sale._id.toString(),
@@ -270,7 +340,10 @@ class Sale {
         // Check expiration on read
         for (let s of sales) {
             const isExpired = await Sale.checkExpired(s);
-            if (isExpired) s.status = 'expired';
+            if (isExpired) {
+                await Sale.updateStatus(s._id, 'expired');
+                s.status = 'expired';
+            }
         }
 
         return sales.map(s => ({
