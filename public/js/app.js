@@ -577,6 +577,18 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span class="label">Sản phẩm sắp hết</span>
                                 <span class="value text-danger" id="report-low-stock">0</span>
                             </div>
+                            <div class="report-summary-card">
+                                <span class="label">Đơn thành công</span>
+                                <span class="value text-success" id="report-orders-completed">0</span>
+                            </div>
+                            <div class="report-summary-card">
+                                <span class="label">Đơn chờ xử lý</span>
+                                <span class="value text-warning" id="report-orders-pending">0</span>
+                            </div>
+                            <div class="report-summary-card">
+                                <span class="label">Đơn đã hủy</span>
+                                <span class="value text-danger" id="report-orders-cancelled">0</span>
+                            </div>
                         </div>
 
                         <!-- Biểu đồ và Top sản phẩm -->
@@ -590,7 +602,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <option value="month">Theo tháng (Năm này)</option>
                                     </select>
                                 </div>
-                                <canvas id="revenueChart" style="width: 100%; height: 350px;"></canvas>
+                                <div style="position: relative; height: 350px; width: 100%;">
+                                    <canvas id="revenueChart"></canvas>
+                                </div>
                             </div>
                             <div class="report-card">
                                 <h3><i data-lucide="award"></i> Sản phẩm bán chạy</h3>
@@ -2139,6 +2153,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (document.getElementById('report-today-orders')) document.getElementById('report-today-orders').innerText = data.today_orders || 0;
             if (document.getElementById('report-low-stock')) document.getElementById('report-low-stock').innerText = data.low_stock_count || 0;
+            
+            // New status-based order counts
+            if (document.getElementById('report-orders-completed')) document.getElementById('report-orders-completed').innerText = data.orders_completed || 0;
+            if (document.getElementById('report-orders-pending')) document.getElementById('report-orders-pending').innerText = data.orders_pending || 0;
+            if (document.getElementById('report-orders-cancelled')) document.getElementById('report-orders-cancelled').innerText = data.orders_cancelled || 0;
 
             if (bestTable && data.bestSellers) {
                 bestTable.innerHTML = data.bestSellers.length > 0 
@@ -2193,6 +2212,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
                         plugins: { legend: { position: 'top' } },
                         scales: { y: { beginAtZero: true } }
                     }

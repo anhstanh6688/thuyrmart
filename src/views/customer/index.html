@@ -121,6 +121,7 @@
             <div class="featured-grid" id="featured-products">
                 <!-- Products will be loaded via JS -->
             </div>
+            <div class="pagination" id="featured-pagination" style="margin-top: 40px;"></div>
         </div>
     </section>
 
@@ -243,11 +244,35 @@
     </footer>
 
     <script src="/js/customer.js"></script>
+    <script src="/js/pagination.js"></script>
     <script>
         // Initialize Lucide icons
         lucide.createIcons();
-        document.addEventListener('DOMContentLoaded', () => {
-            window.loadAllProducts('featured-products');
+        document.addEventListener('DOMContentLoaded', async () => {
+            const products = await window.loadAllProducts();
+            let currentPage = 1;
+            const itemsPerPage = 8;
+            
+            const renderFeaturedGrid = () => {
+                const grid = document.getElementById('featured-products');
+                if (!grid) return;
+                if (!products || products.length === 0) {
+                    grid.innerHTML = '<p class="info-msg">Hiện chưa có sản phẩm nào được hiển thị.</p>';
+                    return;
+                }
+                const startIdx = (currentPage - 1) * itemsPerPage;
+                const paginated = products.slice(startIdx, startIdx + itemsPerPage);
+                window.renderProducts(paginated, grid);
+                
+                const paginationEl = document.getElementById('featured-pagination');
+                window.renderPagination(products.length, itemsPerPage, currentPage, paginationEl, (newPage) => {
+                    currentPage = newPage;
+                    renderFeaturedGrid();
+                    document.querySelector('.products-header')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            };
+            
+            renderFeaturedGrid();
         });
     </script>
     <script src="/js/ai-chatbox.js"></script>

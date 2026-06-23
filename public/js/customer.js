@@ -474,17 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userProfile) userProfile.style.display = 'none';
     }
 
-    // Auto-load featured if grid exists
-    if (featuredProductsGrid) {
-        loadAllProducts('featured-products').then(products => {
-            if (!products || products.length === 0) {
-                featuredProductsGrid.innerHTML = '<p class="info-msg">Hiện chưa có sản phẩm nào được hiển thị.</p>';
-            } else {
-                // Limit to 8 for featured
-                renderProducts(products.slice(0, 8), featuredProductsGrid);
-            }
-        });
-    }
+    // Auto-load featured is now handled dynamically in index.html to support pagination
 });
 
 // ===== Navigation Category Dropdown Loader =====
