@@ -605,21 +605,23 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
 
-                        <!-- Biểu đồ và Top sản phẩm -->
-                        <div class="report-main-section">
-                            <div class="report-chart-card">
-                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;">
-                                    <h3 style="margin: 0; display:flex; align-items:center; gap:8px;"><i data-lucide="line-chart" style="color:var(--primary-color);"></i> Biểu đồ Tăng trưởng</h3>
-                                    <select id="report-chart-filter" class="pos-input" style="max-width: 180px; padding: 6px 12px; font-size: 13px; font-weight: 600; height: 34px;">
-                                        <option value="7days">7 ngày qua</option>
-                                        <option value="day">Theo ngày (Tháng này)</option>
-                                        <option value="month">Theo tháng (Năm này)</option>
-                                    </select>
-                                </div>
-                                <div style="position: relative; height: 350px; width: 100%;">
-                                    <canvas id="revenueChart"></canvas>
-                                </div>
+                        <!-- Biểu đồ tăng trưởng (Full Width) -->
+                        <div class="report-card" style="margin-bottom: 32px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;">
+                                <h3 style="margin: 0; display:flex; align-items:center; gap:8px;"><i data-lucide="line-chart" style="color:var(--primary-color);"></i> Biểu đồ Tăng trưởng</h3>
+                                <select id="report-chart-filter" class="pos-input" style="max-width: 180px; padding: 6px 12px; font-size: 13px; font-weight: 600; height: 34px;">
+                                    <option value="7days">7 ngày qua</option>
+                                    <option value="day">Theo ngày (Tháng này)</option>
+                                    <option value="month">Theo tháng (Năm này)</option>
+                                </select>
                             </div>
+                            <div style="position: relative; height: 350px; width: 100%;">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Grid 1: Sản phẩm & Kho (Sản phẩm bán chạy & Tồn kho nhiều) -->
+                        <div class="reports-grid" style="margin-bottom: 32px;">
                             <div class="report-card">
                                 <h3><i data-lucide="award"></i> Sản phẩm bán chạy</h3>
                                 <table class="report-table-compact" id="best-selling-table">
@@ -627,10 +629,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <tbody></tbody>
                                 </table>
                             </div>
-                        </div>
-
-                        <!-- Bảng chi tiết bổ sung -->
-                        <div class="reports-grid">
                             <div class="report-card">
                                 <h3><i data-lucide="archive"></i> Tồn kho nhiều</h3>
                                 <table class="report-table-compact" id="slow-moving-table">
@@ -638,6 +636,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <tbody></tbody>
                                 </table>
                             </div>
+                        </div>
+
+                        <!-- Grid 2: Đơn hàng & Công nợ (Đơn hàng gần đây & Khách hàng còn nợ) -->
+                        <div class="reports-grid">
                             <div class="report-card">
                                 <h3><i data-lucide="history"></i> Đơn hàng gần đây</h3>
                                 <table class="report-table-compact" id="recent-orders-table">
@@ -645,18 +647,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <tbody></tbody>
                                 </table>
                             </div>
-                        </div>
-
-                        <!-- Công nợ khách hàng -->
-                        <div class="report-card" style="border-left: 4px solid #f59e0b;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                                <h3 style="margin:0;"><i data-lucide="alert-triangle" style="color:#f59e0b;"></i> Khách hàng còn nợ</h3>
-                                <span id="report-total-debt-badge" style="background:#fef3c7; color:#b45309; padding:6px 16px; border-radius:20px; font-weight:700; font-size:14px;">Tổng: 0đ</span>
+                            <div class="report-card" style="border-left: 4px solid #f59e0b;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                                    <h3 style="margin:0; font-size: 18px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 12px;"><i data-lucide="alert-triangle" style="color:#f59e0b;"></i> Khách hàng còn nợ</h3>
+                                    <span id="report-total-debt-badge" style="background:#fef3c7; color:#b45309; padding:6px 16px; border-radius:20px; font-weight:700; font-size:14px;">Tổng: 0đ</span>
+                                </div>
+                                <table class="report-table-compact" id="customer-debt-table">
+                                    <thead><tr><th>Khách hàng</th><th>Điện thoại</th><th style="text-align:right;">Số nợ</th><th style="text-align:center;">Trạng thái</th></tr></thead>
+                                    <tbody><tr><td colspan="4" class="text-muted" style="text-align:center; padding:20px;">Đang tải...</td></tr></tbody>
+                                </table>
                             </div>
-                            <table class="report-table-compact" id="customer-debt-table">
-                                <thead><tr><th>Khách hàng</th><th>Điện thoại</th><th style="text-align:right;">Số nợ</th><th style="text-align:center;">Trạng thái</th></tr></thead>
-                                <tbody><tr><td colspan="4" class="text-muted" style="text-align:center; padding:20px;">Đang tải...</td></tr></tbody>
-                            </table>
                         </div>
                     </div>
                 `;
