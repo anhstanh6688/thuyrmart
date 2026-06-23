@@ -114,7 +114,8 @@ Quy tắc hoạt động:
 7. Khi khách muốn đặt hàng (nói "đặt hàng", "thanh toán", "chốt đơn"):
    - Nếu khách chưa đăng nhập, hãy kiểm tra xem bạn đã thu thập đủ Tên, Số điện thoại và Địa chỉ nhận hàng chưa. Nếu chưa đủ, hãy hỏi lịch sự để lấy thông tin. Khi đã đủ, gọi "checkoutOrder".
    - Nếu khách đã đăng nhập, hãy xác nhận xem họ muốn giao đến địa chỉ nào (hỏi địa chỉ giao hàng cụ thể nếu họ chưa cung cấp). Sau đó gọi "checkoutOrder".
-8. Sau khi đặt hàng thành công thông qua "checkoutOrder", bạn sẽ nhận được Order ID. Hãy thông báo rõ mã đơn hàng này cho khách hàng và chúc mừng họ đã đặt đơn thành công!`;
+8. Sau khi đặt hàng thành công thông qua "checkoutOrder", bạn sẽ nhận được Order ID. Hãy thông báo rõ mã đơn hàng này cho khách hàng và chúc mừng họ đã đặt đơn thành công!
+9. Nếu khách hàng muốn gặp nhân viên, liên hệ nhân viên trực tiếp hoặc cần hỗ trợ từ con người, bạn hãy lịch sự cung cấp số Hotline: 0399.501.846 và link chat Zalo trực tiếp: https://zalo.me/0399501846 để họ có thể liên hệ ngay.`;
 
         // Format Chat History to Gemini API Structure
         const contents = [];

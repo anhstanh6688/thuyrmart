@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const titleText = isAdmin ? 'Trợ lý ảo Admin - ThuyR Mart' : 'Trợ lý ảo ThuyR Mart';
     const welcomeText = isAdmin 
         ? 'Chào Sếp! Em là trợ lý ảo AI quản trị của <strong>ThuyR Mart</strong>. Em có thể báo cáo doanh thu, thống kê tồn kho hoặc sản phẩm bán chạy. Hãy chọn các nút nhanh dưới đây hoặc hỏi em nhé!'
-        : 'Chào Anh/Chị! Em là trợ lý ảo AI thông minh của <strong>ThuyR Mart</strong>. Mời Anh/Chị bấm vào các nút bên dưới để khám phá các tính năng hoặc gõ câu hỏi bất kỳ nhé!';
+        : 'Chào Anh/Chị! Em là trợ lý ảo AI thông minh của <strong>ThuyR Mart</strong>. Mời Anh/Chị bấm vào các nút bên dưới để khám phá tính năng, gõ câu hỏi bất kỳ hoặc chọn <strong>Liên hệ nhân viên</strong> để gặp hỗ trợ trực tiếp nhé!';
 
     const menuGridHTML = isAdmin 
         ? `<div class="ai-quick-replies-grid">
@@ -437,8 +437,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="ai-quick-btn" data-query="Khuyến mãi HOT">
                 <i data-lucide="tag"></i> Khuyến mãi HOT
             </button>
-            <button class="ai-quick-btn" data-query="Liên hệ hỗ trợ">
-                <i data-lucide="phone"></i> Liên hệ hỗ trợ
+            <button class="ai-quick-btn" data-query="Liên hệ nhân viên">
+                <i data-lucide="phone"></i> Liên hệ nhân viên
             </button>
           </div>`;
 
@@ -719,8 +719,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     reply = '<strong>ThuyR Mart</strong> cam kết hỗ trợ khách hàng đổi trả hàng miễn phí trong vòng <strong>7 ngày</strong> kể từ khi nhận sản phẩm nếu sản phẩm bị lỗi kỹ thuật hoặc hư hỏng do vận chuyển. Vui lòng mang theo hóa đơn và giữ nguyên tem mác sản phẩm!';
                 } else if (q.includes('khuyến mãi')) {
                     reply = 'Khuyến mãi đặc biệt mừng hè 2026: Nhập mã giảm giá <strong>THUYRMART2026</strong> để được chiết khấu ngay 10% tổng giá trị đơn hàng khi thanh toán trực tuyến! Đặt hàng ngay thôi!';
-                } else if (q.includes('liên hệ')) {
-                    reply = 'Nếu cần hỗ trợ gấp hoặc tư vấn trực tiếp, quý khách vui lòng liên hệ hotline chăm sóc khách hàng: <strong>0399.501.846</strong> hoặc qua email: <strong>support@thuyrmart.vn</strong>. Hân hạnh được hỗ trợ quý khách!';
+                } else if (q.includes('liên hệ') || q.includes('nhân viên')) {
+                    reply = 'Dạ, để liên hệ trực tiếp với nhân viên hỗ trợ của **ThuyR Mart**, quý khách vui lòng chọn một trong các kênh sau ạ:\n\n' +
+                            '📞 **Hotline gọi nhanh**: [0399.501.846](tel:0399501846)\n' +
+                            '💬 **Chat Zalo trực tiếp**: [Nhắn tin Zalo](https://zalo.me/0399501846)\n' +
+                            '✉️ **Email hỗ trợ**: support@thuyrmart.vn\n\n' +
+                            'Nhân viên ThuyR Mart luôn sẵn sàng hỗ trợ quý khách!';
                 }
 
                 if (reply) {
