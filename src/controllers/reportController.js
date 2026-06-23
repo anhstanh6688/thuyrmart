@@ -38,6 +38,9 @@ exports.getDashboardStats = async (req, res) => {
         const ordersPending = await SaleModel.countDocuments({ status: 'pending' });
         const ordersCancelled = await SaleModel.countDocuments({ status: 'cancelled' });
 
+        // 3c. Total Customers Count
+        const totalCustomersCount = await CustomerModel.countDocuments();
+
         // 4. Recent Orders
         const recentOrders = await SaleModel.find()
             .populate('customer_id', 'name')
@@ -128,6 +131,7 @@ exports.getDashboardStats = async (req, res) => {
             orders_completed: ordersCompleted,
             orders_pending: ordersPending,
             orders_cancelled: ordersCancelled,
+            total_customers_count: totalCustomersCount,
             recentOrders: recentOrders.map(o => ({
                 id: o._id,
                 customer_name: o.customer_id?.name || 'Khách lẻ',

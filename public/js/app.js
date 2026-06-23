@@ -559,35 +559,49 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
 
 
+                        <!-- Thống kê hôm nay -->
+                        <div style="margin-bottom: 24px;">
+                            <div style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; font-family: 'Inter', sans-serif;">Số liệu hôm nay</div>
+                            <div class="report-summary-grid">
+                                <div class="report-summary-card">
+                                    <span class="label">Doanh thu ngày</span>
+                                    <span class="value" id="report-today-rev">0đ</span>
+                                </div>
+                                <div class="report-summary-card">
+                                    <span class="label">Lợi nhuận ngày</span>
+                                    <span class="value" id="report-today-profit">0đ</span>
+                                </div>
+                                <div class="report-summary-card">
+                                    <span class="label">Số đơn hàng</span>
+                                    <span class="value" id="report-today-orders">0</span>
+                                </div>
+                                <div class="report-summary-card">
+                                    <span class="label">Sản phẩm sắp hết</span>
+                                    <span class="value text-danger" id="report-low-stock">0</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Thống kê tổng quan -->
-                        <div class="report-summary-grid">
-                            <div class="report-summary-card">
-                                <span class="label">Doanh thu ngày</span>
-                                <span class="value" id="report-today-rev">0đ</span>
-                            </div>
-                            <div class="report-summary-card">
-                                <span class="label">Lợi nhuận ngày</span>
-                                <span class="value" id="report-today-profit">0đ</span>
-                            </div>
-                            <div class="report-summary-card">
-                                <span class="label">Số đơn hàng</span>
-                                <span class="value" id="report-today-orders">0</span>
-                            </div>
-                            <div class="report-summary-card">
-                                <span class="label">Sản phẩm sắp hết</span>
-                                <span class="value text-danger" id="report-low-stock">0</span>
-                            </div>
-                            <div class="report-summary-card">
-                                <span class="label">Đơn thành công</span>
-                                <span class="value text-success" id="report-orders-completed">0</span>
-                            </div>
-                            <div class="report-summary-card">
-                                <span class="label">Đơn chờ xử lý</span>
-                                <span class="value text-warning" id="report-orders-pending">0</span>
-                            </div>
-                            <div class="report-summary-card">
-                                <span class="label">Đơn đã hủy</span>
-                                <span class="value text-danger" id="report-orders-cancelled">0</span>
+                        <div style="margin-bottom: 24px;">
+                            <div style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; font-family: 'Inter', sans-serif;">Thống kê tổng quan</div>
+                            <div class="report-summary-grid">
+                                <div class="report-summary-card">
+                                    <span class="label">Đơn thành công</span>
+                                    <span class="value text-success" id="report-orders-completed">0</span>
+                                </div>
+                                <div class="report-summary-card">
+                                    <span class="label">Đơn chờ xử lý</span>
+                                    <span class="value text-warning" id="report-orders-pending">0</span>
+                                </div>
+                                <div class="report-summary-card">
+                                    <span class="label">Đơn đã hủy</span>
+                                    <span class="value text-danger" id="report-orders-cancelled">0</span>
+                                </div>
+                                <div class="report-summary-card">
+                                    <span class="label">Tổng khách hàng</span>
+                                    <span class="value text-primary" id="report-total-customers">0</span>
+                                </div>
                             </div>
                         </div>
 
@@ -2158,6 +2172,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (document.getElementById('report-orders-completed')) document.getElementById('report-orders-completed').innerText = data.orders_completed || 0;
             if (document.getElementById('report-orders-pending')) document.getElementById('report-orders-pending').innerText = data.orders_pending || 0;
             if (document.getElementById('report-orders-cancelled')) document.getElementById('report-orders-cancelled').innerText = data.orders_cancelled || 0;
+            if (document.getElementById('report-total-customers')) document.getElementById('report-total-customers').innerText = data.total_customers_count || 0;
 
             if (bestTable && data.bestSellers) {
                 bestTable.innerHTML = data.bestSellers.length > 0 
