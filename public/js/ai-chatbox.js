@@ -3,6 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Detect if we are on the admin panel
     const isAdmin = window.location.pathname.startsWith('/admin');
 
+    // State for AI Ordering & Chat History
+    let draftCart = [];
+    let chatHistory = [];
+
     // 1. Create and Inject Soft Premium Chatbox Styles
     const style = document.createElement('style');
     style.innerHTML = `
@@ -368,6 +372,24 @@ document.addEventListener('DOMContentLoaded', () => {
         .ai-msg-bubble a:hover {
             color: #003fa6;
         }
+
+        /* AI Cart Preview */
+        .ai-chat-cart-preview {
+            padding: 10px 20px;
+            background: var(--surface-container-low, #f0f3ff);
+            border-top: 1px solid var(--outline-variant, #c3c6d7);
+            font-size: 13px;
+            color: var(--on-surface, #111c2d);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Manrope', sans-serif;
+            animation: ai-slide-up 0.2s ease-out;
+        }
+        @keyframes ai-slide-up {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     `;
     document.head.appendChild(style);
 
@@ -471,6 +493,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${menuGridHTML}
             </div>
 
+            <!-- Cart Preview Banner -->
+            <div class="ai-chat-cart-preview" id="ai-chat-cart-preview" style="display: none;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <i data-lucide="shopping-cart" style="width:16px; height:16px; color:var(--primary, #004ac6);"></i>
+                    <span>Giỏ nháp: <strong id="ai-cart-items-count">0</strong> sp</span>
+                </div>
+                <div>Tổng: <strong id="ai-cart-total-amount" style="color:var(--primary, #004ac6);">0đ</strong></div>
+            </div>
+
             <!-- Bottom Input bar -->
             <div class="ai-chat-input-area">
                 <button class="ai-chat-action-btn" id="ai-chat-clear" title="Xóa lịch sử chat">
@@ -522,6 +553,26 @@ document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
     });
 
+    // Helper function to update cart preview banner
+    function updateCartIndicator() {
+        const preview = document.getElementById('ai-chat-cart-preview');
+        const countEl = document.getElementById('ai-cart-items-count');
+        const totalEl = document.getElementById('ai-cart-total-amount');
+        if (!preview || !countEl || !totalEl) return;
+
+        if (draftCart && draftCart.length > 0) {
+            let totalQty = draftCart.reduce((sum, item) => sum + item.quantity, 0);
+            let totalAmount = draftCart.reduce((sum, item) => sum + (item.selling_price * item.quantity), 0);
+            
+            countEl.textContent = totalQty;
+            totalEl.textContent = totalAmount.toLocaleString('vi-VN') + 'đ';
+            preview.style.display = 'flex';
+        } else {
+            preview.style.display = 'none';
+        }
+        lucide.createIcons();
+    }
+
     // 6. Clear Chat History
     clearBtn.addEventListener('click', () => {
         if (confirm('Bạn có muốn xóa toàn bộ lịch sử trò chuyện?')) {
@@ -537,6 +588,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 ${menuGridHTML}
             `;
+            draftCart = [];
+            chatHistory = [];
+            updateCartIndicator();
             lucide.createIcons();
             wireMenuButtons();
         }
@@ -567,6 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Render User message
         appendMessage(text, 'user');
+        chatHistory.push({ sender: 'user', text: text });
         input.value = '';
         scrollToBottom();
 
@@ -579,13 +634,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/ai/query', {
                 method: 'POST',
                 headers: getHeaders(),
-                body: JSON.stringify({ query: text })
+                body: JSON.stringify({ 
+                    query: text,
+                    history: chatHistory,
+                    draftCart: draftCart
+                })
             });
             const data = await res.json();
             
             // Remove Loading and Render Response
             removeLoading(loadingId);
-            appendMessage(data.response || 'Xin lỗi, tôi đã gặp trục trặc kỹ thuật. Vui lòng thử lại sau!', 'bot');
+            
+            if (data.response) {
+                appendMessage(data.response, 'bot');
+                chatHistory.push({ sender: 'bot', text: data.response });
+                if (data.draftCart) {
+                    draftCart = data.draftCart;
+                    updateCartIndicator();
+                }
+            } else {
+                appendMessage('Xin lỗi, tôi đã gặp trục trặc kỹ thuật. Vui lòng thử lại sau!', 'bot');
+            }
         } catch (error) {
             console.error('Error sending message:', error);
             removeLoading(loadingId);
@@ -609,6 +678,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleQuickReply = async (query) => {
         // First append user action
         appendMessage(query, 'user');
+        chatHistory.push({ sender: 'user', text: query });
         scrollToBottom();
 
         const loadingId = appendLoading();
@@ -625,35 +695,55 @@ document.addEventListener('DOMContentLoaded', () => {
                     const res = await fetch('/api/ai/query', {
                         method: 'POST',
                         headers: getHeaders(),
-                        body: JSON.stringify({ query: query })
+                        body: JSON.stringify({ 
+                            query: query,
+                            history: chatHistory,
+                            draftCart: draftCart
+                        })
                     });
                     const data = await res.json();
                     appendMessage(data.response, 'bot');
+                    chatHistory.push({ sender: 'bot', text: data.response });
                 } catch (e) {
                     appendMessage('Có lỗi xảy ra khi kết nối máy chủ AI để lập báo cáo.', 'bot');
                 }
             } else {
                 // Customer specific quick triggers
+                let reply = "";
                 if (q.includes('trò chuyện ai')) {
-                    appendMessage('Chào bạn! Hãy gõ câu hỏi bất kỳ (như: "sản phẩm bán chạy", "tồn kho mặt hàng", hoặc các tư vấn mua sắm...) vào ô chat để em giải đáp ngay nhé!', 'bot');
+                    reply = 'Chào bạn! Hãy gõ câu hỏi bất kỳ (như: "sản phẩm bán chạy", "tồn kho mặt hàng", hoặc các tư vấn mua sắm...) vào ô chat để em giải đáp ngay nhé!';
                 } else if (q.includes('tra cứu đơn hàng')) {
-                    appendMessage('Chào bạn! Để tra cứu thông tin và lịch sử đơn hàng của bạn nhanh nhất, vui lòng truy cập mục <a href="/account-orders">Đơn hàng của tôi</a> tại trang quản lý Tài khoản cá nhân.', 'bot');
+                    reply = 'Chào bạn! Để tra cứu thông tin và lịch sử đơn hàng của bạn nhanh nhất, vui lòng truy cập mục <a href="/account-orders">Đơn hàng của tôi</a> tại trang quản lý Tài khoản cá nhân.';
                 } else if (q.includes('đổi trả')) {
-                    appendMessage('<strong>ThuyR Mart</strong> cam kết hỗ trợ khách hàng đổi trả hàng miễn phí trong vòng <strong>7 ngày</strong> kể từ khi nhận sản phẩm nếu sản phẩm bị lỗi kỹ thuật hoặc hư hỏng do vận chuyển. Vui lòng mang theo hóa đơn và giữ nguyên tem mác sản phẩm!', 'bot');
+                    reply = '<strong>ThuyR Mart</strong> cam kết hỗ trợ khách hàng đổi trả hàng miễn phí trong vòng <strong>7 ngày</strong> kể từ khi nhận sản phẩm nếu sản phẩm bị lỗi kỹ thuật hoặc hư hỏng do vận chuyển. Vui lòng mang theo hóa đơn và giữ nguyên tem mác sản phẩm!';
                 } else if (q.includes('khuyến mãi')) {
-                    appendMessage('Khuyến mãi đặc biệt mừng hè 2026: Nhập mã giảm giá <strong>THUYRMART2026</strong> để được chiết khấu ngay 10% tổng giá trị đơn hàng khi thanh toán trực tuyến! Đặt hàng ngay thôi!', 'bot');
+                    reply = 'Khuyến mãi đặc biệt mừng hè 2026: Nhập mã giảm giá <strong>THUYRMART2026</strong> để được chiết khấu ngay 10% tổng giá trị đơn hàng khi thanh toán trực tuyến! Đặt hàng ngay thôi!';
                 } else if (q.includes('liên hệ')) {
-                    appendMessage('Nếu cần hỗ trợ gấp hoặc tư vấn trực tiếp, quý khách vui lòng liên hệ hotline chăm sóc khách hàng: <strong>0399.501.846</strong> hoặc qua email: <strong>support@thuyrmart.vn</strong>. Hân hạnh được hỗ trợ quý khách!', 'bot');
+                    reply = 'Nếu cần hỗ trợ gấp hoặc tư vấn trực tiếp, quý khách vui lòng liên hệ hotline chăm sóc khách hàng: <strong>0399.501.846</strong> hoặc qua email: <strong>support@thuyrmart.vn</strong>. Hân hạnh được hỗ trợ quý khách!';
+                }
+
+                if (reply) {
+                    appendMessage(reply, 'bot');
+                    chatHistory.push({ sender: 'bot', text: reply });
                 } else {
                     // Delegate all other queries (like "sản phẩm bán chạy") to backend
                     try {
                         const res = await fetch('/api/ai/query', {
                             method: 'POST',
                             headers: getHeaders(),
-                            body: JSON.stringify({ query: query })
+                            body: JSON.stringify({ 
+                                query: query,
+                                history: chatHistory,
+                                draftCart: draftCart
+                            })
                         });
                         const data = await res.json();
                         appendMessage(data.response, 'bot');
+                        chatHistory.push({ sender: 'bot', text: data.response });
+                        if (data.draftCart) {
+                            draftCart = data.draftCart;
+                            updateCartIndicator();
+                        }
                     } catch (e) {
                         appendMessage('Có lỗi xảy ra khi kết nối máy chủ AI.', 'bot');
                     }
