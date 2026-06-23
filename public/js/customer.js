@@ -486,3 +486,126 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// ===== Navigation Category Dropdown Loader =====
+(function initNavCategoryDropdown() {
+    const dropdownGrid = document.getElementById('nav-dropdown-grid');
+    if (!dropdownGrid) return;
+
+    // Color palette for category icons
+    const categoryPalette = [
+        { bg: '#EFF6FF', color: '#2563EB' },
+        { bg: '#F0FDF4', color: '#16A34A' },
+        { bg: '#FFF7ED', color: '#EA580C' },
+        { bg: '#FDF4FF', color: '#9333EA' },
+        { bg: '#FFF1F2', color: '#E11D48' },
+        { bg: '#F0FDFA', color: '#0D9488' },
+        { bg: '#FFFBEB', color: '#D97706' },
+        { bg: '#F5F3FF', color: '#7C3AED' },
+    ];
+
+    // SVG icons mapped to category keywords (inline SVG, Lucide-style)
+    function getCategoryIcon(name) {
+        const n = (name || '').toLowerCase();
+        // Bánh kẹo / ăn vặt
+        if (n.includes('bánh') || n.includes('kẹo') || n.includes('ăn vặt'))
+            return `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>`;
+        // Kem / đông lạnh
+        if (n.includes('kem') || n.includes('đông lạnh') || n.includes('lạnh'))
+            return `<svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 1 5 5c0 1.61-.76 3.04-1.94 3.96L18 22H6l2.94-11.04A5 5 0 0 1 12 2z"/></svg>`;
+        // Nước / đồ uống
+        if (n.includes('nước') || n.includes('đồ uống') || n.includes('giải khát'))
+            return `<svg viewBox="0 0 24 24"><path d="M8 2h8l1 7H7L8 2z"/><rect x="7" y="9" width="10" height="11" rx="2"/><path d="M10 13h4"/></svg>`;
+        // Gia vị / thực phẩm
+        if (n.includes('gia vị') || n.includes('thực phẩm') || n.includes('đóng gói'))
+            return `<svg viewBox="0 0 24 24"><path d="M3 2h18v4H3z"/><path d="M5 6v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6"/><path d="M10 11h4"/></svg>`;
+        // Hóa mỹ phẩm / chăm sóc
+        if (n.includes('hóa mỹ') || n.includes('chăm sóc') || n.includes('mỹ phẩm'))
+            return `<svg viewBox="0 0 24 24"><path d="M9 3h6l1 4H8L9 3z"/><rect x="7" y="7" width="10" height="14" rx="2"/><path d="M12 11v6"/><path d="M9 14h6"/></svg>`;
+        // Vệ sinh / tẩy rửa
+        if (n.includes('chất tẩy') || n.includes('vệ sinh') || n.includes('tẩy rửa'))
+            return `<svg viewBox="0 0 24 24"><path d="M4 20h16"/><path d="M9 20V8l3-5 3 5v12"/><path d="M6 12h12"/></svg>`;
+        // Thiết bị điện
+        if (n.includes('thiết bị') || n.includes('điện') || n.includes('dân dụng'))
+            return `<svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 8h4"/><circle cx="12" cy="16" r="1" fill="currentColor" stroke="none"/></svg>`;
+        // Rau củ quả
+        if (n.includes('rau') || n.includes('củ') || n.includes('quả') || n.includes('trái cây'))
+            return `<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/></svg>`;
+        // Thịt / hải sản
+        if (n.includes('thịt') || n.includes('cá') || n.includes('hải sản'))
+            return `<svg viewBox="0 0 24 24"><path d="M6.5 12C4 10 2 7 2 5c3 0 5 1 6.5 3"/><path d="M17.5 12C20 10 22 7 22 5c-3 0-5 1-6.5 3"/><ellipse cx="12" cy="14" rx="6" ry="5"/><path d="M9 14h6"/></svg>`;
+        // Sữa / trứng
+        if (n.includes('sữa') || n.includes('trứng'))
+            return `<svg viewBox="0 0 24 24"><path d="M8 2h8c0 4-2 6-4 7-2-1-4-3-4-7z"/><rect x="6" y="9" width="12" height="13" rx="2"/></svg>`;
+        // Mặc định: hộp sản phẩm
+        return `<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg>`;
+    }
+
+    fetch('/api/categories')
+        .then(res => res.json())
+        .then(categories => {
+            if (!categories || categories.length === 0) {
+                dropdownGrid.innerHTML = '<p style="color:var(--on-surface-variant); font-size:13px; padding:8px;">Chưa có danh mục nào.</p>';
+                return;
+            }
+            dropdownGrid.innerHTML = categories.map((cat, i) => {
+                const palette = categoryPalette[i % categoryPalette.length];
+                const icon = getCategoryIcon(cat.name);
+                const encodedId = encodeURIComponent(cat.id);
+                return `
+                <a href="/products?category=${encodedId}" class="nav-dropdown-item">
+                    <div class="nav-dropdown-item-icon" style="background:${palette.bg}; color:${palette.color};">
+                        ${icon}
+                    </div>
+                    <div class="nav-dropdown-item-text">
+                        <span class="nav-dropdown-item-name">${cat.name}</span>
+                        <span class="nav-dropdown-item-desc">${cat.description || 'Xem sản phẩm →'}</span>
+                    </div>
+                </a>`;
+            }).join('');
+        })
+        .catch(() => {
+            dropdownGrid.innerHTML = '<p style="color:var(--on-surface-variant); font-size:13px; padding:8px;">Không thể tải danh mục.</p>';
+        });
+
+    // JS-controlled show/hide to avoid CSS transform conflict with fixed positioning
+    const navItem = document.querySelector('.nav-item-dropdown');
+    const dropdown = document.getElementById('nav-categories-dropdown');
+    if (navItem && dropdown) {
+        let hideTimer = null;
+
+        function positionDropdown() {
+            const rect = navItem.getBoundingClientRect();
+            const dropW = 480;
+            let left = rect.left + rect.width / 2 - dropW / 2;
+            left = Math.max(16, Math.min(left, window.innerWidth - dropW - 16));
+            dropdown.style.left = left + 'px';
+            dropdown.style.transform = 'none';
+        }
+
+        function showDropdown() {
+            clearTimeout(hideTimer);
+            positionDropdown();
+            dropdown.style.opacity = '1';
+            dropdown.style.pointerEvents = 'auto';
+            dropdown.style.top = '80px';
+            navItem.classList.add('is-open');
+        }
+
+        function hideDropdown() {
+            hideTimer = setTimeout(() => {
+                dropdown.style.opacity = '0';
+                dropdown.style.pointerEvents = 'none';
+                navItem.classList.remove('is-open');
+            }, 80);
+        }
+
+        navItem.addEventListener('mouseenter', showDropdown);
+        navItem.addEventListener('mouseleave', hideDropdown);
+        dropdown.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+        dropdown.addEventListener('mouseleave', hideDropdown);
+    }
+})();
+
+
+
