@@ -232,7 +232,7 @@ Quy tắc hoạt động:
         let loopCount = 0;
         const maxLoops = 5;
         let currentContents = [...contents];
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${geminiApiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${geminiApiKey}`;
 
         while (loopCount < maxLoops) {
             const body = {
