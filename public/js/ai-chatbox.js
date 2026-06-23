@@ -214,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
             line-height: 1.5;
             word-break: break-word;
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+            white-space: pre-wrap;
         }
         .user-msg .ai-msg-bubble {
             background: var(--primary, #004ac6);
