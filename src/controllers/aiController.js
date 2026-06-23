@@ -97,7 +97,8 @@ exports.queryAI = async (req, res) => {
         }
 
         // Build system instruction and user context
-        const userContextText = req.user 
+        // Build system instruction and user context (Only treat as logged-in if their role is customer)
+        const userContextText = (req.user && req.user.role === 'customer')
             ? `Khách hàng hiện tại ĐÃ ĐĂNG NHẬP: Họ tên "${req.user.full_name}", Số điện thoại "${req.user.phone}", ID "${req.user.id}". Không cần hỏi lại tên và SĐT của họ.`
             : `Khách hàng hiện tại CHƯA ĐĂNG NHẬP (Khách vãng lai). Nếu họ muốn checkoutOrder, bắt buộc bạn phải hỏi xin Họ tên, Số điện thoại và Địa chỉ giao hàng trước.`;
 
@@ -232,28 +233,44 @@ Quy tắc hoạt động:
         let loopCount = 0;
         const maxLoops = 5;
         let currentContents = [...contents];
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${geminiApiKey}`;
 
-        while (loopCount < maxLoops) {
+        const makeApiRequest = async (modelName, contentsPayload) => {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey}`;
             const body = {
-                contents: currentContents,
+                contents: contentsPayload,
                 systemInstruction: { parts: [{ text: systemPrompt }] },
                 tools: tools,
                 generationConfig: { maxOutputTokens: 500, temperature: 0.1 }
             };
-
             const apiRes = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
-
             if (!apiRes.ok) {
                 const errorText = await apiRes.text();
                 throw new Error(`Gemini API Error: ${apiRes.status} - ${errorText}`);
             }
+            return await apiRes.json();
+        };
 
-            const apiData = await apiRes.json();
+        while (loopCount < maxLoops) {
+            let apiData;
+            try {
+                // Try 1: gemini-3.5-flash (as requested by user "như cũ")
+                apiData = await makeApiRequest('gemini-3.5-flash', currentContents);
+            } catch (err35) {
+                console.warn("gemini-3.5-flash failed, retrying with gemini-3.1-flash-lite...", err35.message);
+                try {
+                    // Try 2: gemini-3.1-flash-lite (high quota fallback)
+                    apiData = await makeApiRequest('gemini-3.1-flash-lite', currentContents);
+                } catch (err31) {
+                    console.warn("gemini-3.1-flash-lite failed, retrying with gemini-2.5-flash-lite...", err31.message);
+                    // Try 3: gemini-2.5-flash-lite (final backup fallback)
+                    apiData = await makeApiRequest('gemini-2.5-flash-lite', currentContents);
+                }
+            }
+
             const candidate = apiData.candidates?.[0];
             if (!candidate) {
                 throw new Error("No candidate returned from Gemini API");
