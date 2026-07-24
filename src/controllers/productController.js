@@ -19,6 +19,23 @@ exports.getProductById = async (req, res) => {
     }
 };
 
+exports.getProductByBarcode = async (req, res) => {
+    try {
+        const barcode = String(req.params.barcode || '').trim();
+        if (!barcode) {
+            return res.status(400).json({ success: false, message: 'Mã vạch không hợp lệ' });
+        }
+        const product = await Product.getByBarcode(barcode);
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm', barcode });
+        }
+        return res.json({ success: true, data: product });
+    } catch (error) {
+        console.error('getProductByBarcode:', error);
+        return res.status(500).json({ success: false, message: 'Lỗi hệ thống' });
+    }
+};
+
 exports.createProduct = async (req, res) => {
     try {
         const id = await Product.create(req.body);

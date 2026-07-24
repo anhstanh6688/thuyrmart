@@ -21,35 +21,82 @@
                 <a href="#" class="nav-item active" data-page="dashboard">
                     <i data-lucide="layout-dashboard"></i> <span>Tổng quan</span>
                 </a>
-                <a href="#" class="nav-item" data-page="pos">
+                <a href="#" class="nav-item" data-page="pos" style="position:relative;">
                     <i data-lucide="monitor-smartphone"></i> <span>Bán hàng (POS)</span>
+                    <span id="pos-cart-badge" style="display:none; position:absolute; right:12px; top:50%; transform:translateY(-50%); background:#ef4444; color:white; border-radius:50%; width:20px; height:20px; font-size:11px; font-weight:700; align-items:center; justify-content:center;"></span>
                 </a>
-                <a href="#" class="nav-item" data-page="products">
-                    <i data-lucide="package"></i> <span>Sản phẩm</span>
-                </a>
-                <a href="#" class="nav-item" data-page="categories">
-                    <i data-lucide="tags"></i> <span>Danh mục</span>
-                </a>
-                <a href="#" class="nav-item" data-page="stock-in">
-                    <i data-lucide="download"></i> <span>Nhập hàng</span>
-                </a>
-                <a href="#" class="nav-item" data-page="suppliers">
-                    <i data-lucide="truck"></i> <span>Nhà cung cấp</span>
-                </a>
-                <a href="#" class="nav-item" data-page="inventory-logs">
-                    <i data-lucide="clipboard-list"></i> <span>Nhật ký kho</span>
-                </a>
-                <a href="#" class="nav-item" data-page="customers">
-                    <i data-lucide="users"></i> <span>Khách hàng</span>
-                </a>
-                <a href="#" class="nav-item" data-page="sales-history">
-                    <i data-lucide="history"></i> <span>Lịch sử bán</span>
-                </a>
-                <a href="#" class="nav-item" data-page="users">
-                    <i data-lucide="shield"></i> <span>Nhân viên</span>
-                </a>
+
+                <!-- Group 1: Hàng hóa & Kho -->
+                <div class="nav-group open">
+                    <div class="nav-group-header">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <i data-lucide="package" style="width:20px; text-align:center;"></i> <span>Hàng hóa & Kho</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="chevron-icon"></i>
+                    </div>
+                    <div class="nav-sub-items">
+                        <a href="#" class="nav-item" data-page="products">
+                            <i data-lucide="box"></i> <span>Sản phẩm</span>
+                        </a>
+                        <a href="#" class="nav-item" data-page="categories">
+                            <i data-lucide="tags"></i> <span>Danh mục</span>
+                        </a>
+                        <a href="#" class="nav-item" data-page="inventory-audit">
+                            <i data-lucide="clipboard-check"></i> <span>Kiểm kê kho</span>
+                        </a>
+                        <a href="#" class="nav-item" data-page="stock-take">
+                            <i data-lucide="scan-barcode"></i> <span>Kiểm kê (Quét mã)</span>
+                        </a>
+                        <a href="#" class="nav-item" data-page="inventory-logs">
+                            <i data-lucide="clipboard-list"></i> <span>Nhật ký kho</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Group 2: Nhập hàng & NCC -->
+                <div class="nav-group">
+                    <div class="nav-group-header">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <i data-lucide="truck" style="width:20px; text-align:center;"></i> <span>Nhập hàng & NCC</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="chevron-icon"></i>
+                    </div>
+                    <div class="nav-sub-items">
+                        <a href="#" class="nav-item" data-page="stock-in">
+                            <i data-lucide="download"></i> <span>Phiếu nhập hàng</span>
+                        </a>
+                        <a href="#" class="nav-item" data-page="suppliers">
+                            <i data-lucide="building-2"></i> <span>Nhà cung cấp</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Group 3: Đối tác & Lịch sử -->
+                <div class="nav-group">
+                    <div class="nav-group-header">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <i data-lucide="users" style="width:20px; text-align:center;"></i> <span>Đối tác & Bán hàng</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="chevron-icon"></i>
+                    </div>
+                    <div class="nav-sub-items">
+                        <a href="#" class="nav-item" data-page="customers">
+                            <i data-lucide="user-check"></i> <span>Khách hàng</span>
+                        </a>
+                        <a href="#" class="nav-item" data-page="sales-history">
+                            <i data-lucide="history"></i> <span>Lịch sử bán</span>
+                        </a>
+                        <a href="#" class="nav-item" data-page="users">
+                            <i data-lucide="shield"></i> <span>Nhân viên</span>
+                        </a>
+                    </div>
+                </div>
+
                 <a href="#" class="nav-item" data-page="reports">
                     <i data-lucide="line-chart"></i> <span>Báo cáo</span>
+                </a>
+                <a href="#" class="nav-item" data-page="settings">
+                    <i data-lucide="settings"></i> <span>Cài đặt</span>
                 </a>
                 <div class="sidebar-footer" style="padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
                     <button id="logout-btn" style="background: none; border: none; color: #94a3b8; display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-size: 0.875rem;">
@@ -86,6 +133,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="/js/pagination.js"></script>
     <script src="/js/app.js"></script>

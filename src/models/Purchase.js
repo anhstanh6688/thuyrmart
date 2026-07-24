@@ -41,12 +41,17 @@ class Purchase {
                 total_amount,
                 paid_amount,
                 balance_amount,
-                items: items.map(item => ({
-                    product_id: isValidId(item.product_id) ? item.product_id : null,
-                    quantity: item.quantity,
-                    unit_price: item.cost_price,
-                    subtotal: item.cost_price * item.quantity
-                })),
+                items: items.map(item => {
+                    const quantity = item.quantity || 0;
+                    const unit_price = item.cost_price || 0;
+                    const subtotal = item.subtotal !== undefined ? item.subtotal : (unit_price * quantity);
+                    return {
+                        product_id: isValidId(item.product_id) ? item.product_id : null,
+                        quantity,
+                        unit_price,
+                        subtotal
+                    };
+                }),
                 note
             });
             const savedPO = await po.save({ session });

@@ -1,9 +1,38 @@
 const Customer = require('../models/Customer');
+const mongoose = require('mongoose');
 
 exports.getAllCustomers = async (req, res) => {
     try {
         const customers = await Customer.getAll();
-        res.json(customers);
+        const SaleModel = mongoose.model('SaleOrder');
+        
+        // Calculate dynamic debt for each customer based on actual unpaid sales
+        const debtStats = await SaleModel.aggregate([
+            { $match: { status: { $nin: ['cancelled', 'expired'] } } },
+            { $group: {
+                _id: "$customer_id",
+                totalFinal: { $sum: "$final_amount" },
+                totalPaid: { $sum: "$paid_amount" }
+            }}
+        ]);
+        
+        const debtMap = new Map();
+        debtStats.forEach(d => {
+            if (d._id) {
+                const unpaid = Math.max(0, d.totalFinal - d.totalPaid);
+                debtMap.set(d._id.toString(), unpaid);
+            }
+        });
+
+        const updatedCustomers = customers.map(c => {
+            const calculatedDebt = debtMap.has(c.id) ? debtMap.get(c.id) : 0;
+            return {
+                ...c,
+                debt: calculatedDebt
+            };
+        });
+
+        res.json(updatedCustomers);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

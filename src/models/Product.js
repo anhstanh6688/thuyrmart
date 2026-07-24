@@ -3,13 +3,14 @@ const mongoose = require('mongoose');
 const productSchema = new mongoose.Schema({
     category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
     sku: { type: String, unique: true },
+    barcode: { type: String, trim: true, index: true, sparse: true, unique: true },
     name: { type: String, required: true },
     alias: { type: String },
     unit: { type: String, default: 'Cái' },
     cost_price: { type: Number, default: 0 },
     selling_price: { type: Number, default: 0 },
     stock_quantity: { type: Number, default: 0 },
-    min_stock: { type: Number, default: 10 },
+    min_stock: { type: Number, default: 5 },
     average_rating: { type: Number, default: 0 },
     review_count: { type: Number, default: 0 },
     description: { type: String },
@@ -26,8 +27,9 @@ class Product {
         return products.map(p => ({
             id: p._id.toString(),
             category_id: p.category_id?._id.toString(),
-            category_name: p.category_id?.name || 'Uncategorized',
+            category_name: p.category_id?.name || 'Khác',
             sku: p.sku,
+            barcode: p.barcode || '',
             name: p.name,
             alias: p.alias,
             unit: p.unit,
@@ -51,8 +53,9 @@ class Product {
         return {
             id: p._id.toString(),
             category_id: p.category_id?._id?.toString() || null,
-            category_name: p.category_id?.name || 'Chưa phân loại',
+            category_name: p.category_id?.name || 'Khác',
             sku: p.sku,
+            barcode: p.barcode || '',
             name: p.name,
             alias: p.alias,
             unit: p.unit,
@@ -73,8 +76,14 @@ class Product {
     }
 
     static async create(data) {
-        if (data.category_id && !mongoose.Types.ObjectId.isValid(data.category_id)) {
+        if (!data.category_id || !mongoose.Types.ObjectId.isValid(data.category_id)) {
             data.category_id = null;
+        }
+        if (!data.sku || data.sku.trim() === '') {
+            data.sku = 'SP' + Date.now().toString().slice(-6) + Math.floor(Math.random() * 1000);
+        }
+        if (data.barcode === '') {
+            delete data.barcode;
         }
         const p = new ProductModel(data);
         const result = await p.save();
@@ -91,16 +100,43 @@ class Product {
         await ProductModel.findByIdAndDelete(id);
     }
 
+    static async getByBarcode(barcode) {
+        const b = String(barcode || '').trim();
+        if (!b) return null;
+        const p = await ProductModel.findOne({ barcode: b, status: { $ne: false } }).populate('category_id');
+        if (!p) return null;
+        return {
+            id: p._id.toString(),
+            category_id: p.category_id?._id?.toString() || null,
+            category_name: p.category_id?.name || 'Chưa phân loại',
+            sku: p.sku,
+            barcode: p.barcode || '',
+            name: p.name,
+            alias: p.alias,
+            unit: p.unit,
+            cost_price: p.cost_price,
+            selling_price: p.selling_price,
+            stock_quantity: p.stock_quantity,
+            min_stock: p.min_stock,
+            description: p.description,
+            images: p.images || [],
+            video: p.video || '',
+            status: p.status
+        };
+    }
+
     static async search(query) {
         const products = await ProductModel.find({
             $or: [
                 { name: new RegExp(query, 'i') },
                 { sku: new RegExp(query, 'i') },
+                { barcode: new RegExp(query, 'i') },
                 { alias: new RegExp(query, 'i') }
             ]
         }).limit(10);
         return products.map(p => ({
             id: p._id.toString(),
+            barcode: p.barcode || '',
             ...p.toObject()
         }));
     }

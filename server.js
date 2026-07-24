@@ -35,11 +35,14 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Root directory - dùng process.cwd() thay vì __dirname vì dotenvx làm __dirname không chính xác
+const ROOT = process.cwd();
+
+app.use(express.static(path.join(ROOT, 'public')));
+app.use('/uploads', express.static(path.join(ROOT, 'uploads')));
 
 // View directory path (MVC)
-const viewsPath = path.join(__dirname, 'src', 'views');
+const viewsPath = path.join(ROOT, 'src', 'views');
 
 // Admin Views
 app.get('/admin/login', (req, res) => {
@@ -47,64 +50,64 @@ app.get('/admin/login', (req, res) => {
 });
 
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'admin', 'index.html'));
+    res.sendFile('admin/index.html', { root: viewsPath });
 });
 
 // Customer Views
 app.get('/', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'index.html'));
+    res.sendFile('customer/index.html', { root: viewsPath });
 });
 
 app.get('/products', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'products.html'));
+    res.sendFile('customer/products.html', { root: viewsPath });
 });
 
 app.get('/products/:id', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'product-detail.html'));
+    res.sendFile('customer/product-detail.html', { root: viewsPath });
 });
 
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'customer-login.html'));
+    res.sendFile('customer/customer-login.html', { root: viewsPath });
 });
 
 app.get('/register', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'register.html'));
+    res.sendFile('customer/register.html', { root: viewsPath });
 });
 
 app.get('/cart', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'cart.html'));
+    res.sendFile('customer/cart.html', { root: viewsPath });
 });
 
 app.get('/checkout', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'checkout.html'));
+    res.sendFile('customer/checkout.html', { root: viewsPath });
 });
 
 app.get('/account', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'account.html'));
+    res.sendFile('customer/account.html', { root: viewsPath });
 });
 
 app.get('/contact', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'contact.html'));
+    res.sendFile('customer/contact.html', { root: viewsPath });
 });
 
 app.get('/about', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'about.html'));
+    res.sendFile('customer/about.html', { root: viewsPath });
 });
 
 app.get('/account-orders', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'account-orders.html'));
+    res.sendFile('customer/account-orders.html', { root: viewsPath });
 });
 
 app.get('/order-success', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'order-success.html'));
+    res.sendFile('customer/order-success.html', { root: viewsPath });
 });
 
 app.get('/account-addresses', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'account-addresses.html'));
+    res.sendFile('customer/account-addresses.html', { root: viewsPath });
 });
 
 app.get('/account-wishlist', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'customer', 'account-wishlist.html'));
+    res.sendFile('customer/account-wishlist.html', { root: viewsPath });
 });
 
 
@@ -123,6 +126,7 @@ const userRoutes = require('./src/routes/userRoutes');
 const inventoryRoutes = require('./src/routes/inventoryRoutes');
 const supplierPaymentRoutes = require('./src/routes/supplierPaymentRoutes');
 const uploadRoutes = require('./src/routes/uploadRoutes');
+const systemRoutes = require('./src/routes/systemRoutes');
 
 const checkStatus = require('./src/middleware/checkStatus');
 
@@ -142,16 +146,21 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/system', systemRoutes);
 
 // Global Error Handler (must be last middleware)
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err.stack);
+    // Nếu lỗi từ sendFile (file không tìm thấy), trả HTML 404 đẹp hơn
+    if (err.status === 404) {
+        return res.status(404).send('<h2>404 - Trang không tồn tại</h2>');
+    }
     res.status(err.status || 500).json({ 
         error: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message 
     });
 });
 
-// 404 handler for unknown API routes
+// 404 handler for unknown API routes (phải sau error handler)
 app.use('/api', (req, res) => {
     res.status(404).json({ error: 'API endpoint not found' });
 });

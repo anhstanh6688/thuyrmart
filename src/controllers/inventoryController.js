@@ -15,37 +15,54 @@ exports.getLogs = async (req, res) => {
 };
 
 exports.adjustStock = async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
     try {
         const { product_id, change_qty, type, note } = req.body;
         
-        const product = await Product.getById(product_id);
-        if (!product) throw new Error('Không tìm thấy sản phẩm');
-
-        // Update product stock
-        // Note: Product.js doesn't have a direct update stock method, I'll update via Mongoose Model directly here or add a method to Product.js
-        // For simplicity and transaction safety, I'll use the Model
         const ProductModel = mongoose.model('Product');
+        const product = await ProductModel.findById(product_id);
+        if (!product) return res.status(404).json({ error: 'Không tìm thấy sản phẩm' });
+
+        // Update stock
         await ProductModel.findByIdAndUpdate(product_id, {
             $inc: { stock_quantity: change_qty }
-        }, { session });
+        });
 
-        // Log the adjustment
+        // Save inventory log
         const log = new InventoryLog({
             product_id,
             type: type || 'adjust',
             quantity: change_qty,
             note: note || 'Điều chỉnh kho thủ công'
         });
-        await log.save({ session });
+        await log.save();
 
-        await session.commitTransaction();
-        res.json({ message: 'Điều chỉnh kho thành công' });
+        res.json({ success: true, message: 'Điều chỉnh kho thành công' });
     } catch (error) {
-        await session.abortTransaction();
+        console.error('adjustStock error:', error);
         res.status(500).json({ error: error.message });
-    } finally {
-        session.endSession();
+    }
+};
+
+// Tạo log nhập kho đơn giản (không dùng transaction, dùng cho quick-create từ barcode scan)
+exports.createLog = async (req, res) => {
+    try {
+        const { product_id, type, quantity, note } = req.body;
+        if (!product_id || !quantity) {
+            return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
+        }
+        // Cập nhật tồn kho
+        const ProductModel = mongoose.model('Product');
+        await ProductModel.findByIdAndUpdate(product_id, { $inc: { stock_quantity: Number(quantity) } });
+        // Tạo log
+        const log = new InventoryLog({
+            product_id,
+            type: type || 'in',
+            quantity: Number(quantity),
+            note: note || 'Tồn kho ban đầu'
+        });
+        await log.save();
+        res.status(201).json({ success: true, message: 'Tạo log kho thành công' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };

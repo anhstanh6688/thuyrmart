@@ -10,6 +10,14 @@ const saleItemSchema = new mongoose.Schema({
     subtotal: { type: Number, required: true }
 });
 
+const returnedItemSchema = new mongoose.Schema({
+    product_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+    quantity: { type: Number, required: true },
+    return_price: { type: Number, required: true },
+    reason: { type: String, default: 'Khách trả hàng' },
+    returned_at: { type: Date, default: Date.now }
+});
+
 const saleOrderSchema = new mongoose.Schema({
     customer_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -18,9 +26,11 @@ const saleOrderSchema = new mongoose.Schema({
     final_amount: { type: Number, default: 0 },
     paid_amount: { type: Number, default: 0 },
     change_amount: { type: Number, default: 0 },
+    refunded_amount: { type: Number, default: 0 },
     payment_method: { type: String, enum: ['cash', 'transfer', 'credit'], default: 'cash' },
     items: [saleItemSchema],
-    status: { type: String, enum: ['completed', 'pending', 'delivering', 'cancelled', 'expired'], default: 'completed' },
+    returned_items: [returnedItemSchema],
+    status: { type: String, enum: ['completed', 'pending', 'delivering', 'cancelled', 'expired', 'returned', 'partially_returned'], default: 'completed' },
     note: { type: String }
 }, { timestamps: true });
 
@@ -284,6 +294,7 @@ class Sale {
             total_amount: s.total_amount,
             final_amount: s.final_amount,
             paid_amount: s.paid_amount,
+            refunded_amount: s.refunded_amount || 0,
             payment_method: s.payment_method,
             order_date: s.createdAt,
             status: s.status,
@@ -296,7 +307,8 @@ class Sale {
         const sale = await SaleModel.findById(id)
             .populate('customer_id')
             .populate('user_id', 'full_name')
-            .populate('items.product_id');
+            .populate('items.product_id')
+            .populate('returned_items.product_id');
             
         if (!sale) return null;
         
@@ -308,6 +320,7 @@ class Sale {
 
         return {
             id: sale._id.toString(),
+            customer_id: sale.customer_id?._id?.toString(),
             customer_name: sale.customer_id?.name || 'Khách lẻ',
             customer_phone: sale.customer_id?.phone,
             user_name: sale.user_id?.full_name,
@@ -316,6 +329,7 @@ class Sale {
             final_amount: sale.final_amount,
             paid_amount: sale.paid_amount,
             change_amount: sale.change_amount,
+            refunded_amount: sale.refunded_amount || 0,
             payment_method: sale.payment_method,
             status: sale.status,
             note: sale.note,
@@ -327,6 +341,14 @@ class Sale {
                 quantity: item.quantity,
                 unit_price: item.unit_price,
                 subtotal: item.subtotal
+            })),
+            returned_items: (sale.returned_items || []).map(r => ({
+                product_id: r.product_id?._id?.toString() || r.product_id?.toString(),
+                product_name: r.product_id?.name || 'Sản phẩm đã xóa',
+                quantity: r.quantity,
+                return_price: r.return_price,
+                reason: r.reason,
+                returned_at: r.returned_at
             }))
         };
     }
