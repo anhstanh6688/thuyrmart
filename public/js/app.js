@@ -224,19 +224,44 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 'dashboard';
     const _savedPage = sessionStorage.getItem('currentPage');
 
-    // Event Listeners
+    // Sidebar Mobile Overlay
+    let sidebarOverlay = document.querySelector('.sidebar-overlay');
+    if (!sidebarOverlay) {
+        sidebarOverlay = document.createElement('div');
+        sidebarOverlay.className = 'sidebar-overlay';
+        document.body.appendChild(sidebarOverlay);
+    }
+
+    const closeMobileSidebar = () => {
+        if (sidebar) sidebar.classList.remove('mobile-open');
+        if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+    };
+
     if (toggleSidebar) {
-        toggleSidebar.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            document.querySelector('.main-content')?.classList.toggle('sidebar-collapsed');
+        toggleSidebar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.innerWidth <= 992) {
+                sidebar.classList.toggle('mobile-open');
+                sidebarOverlay.classList.toggle('active');
+            } else {
+                sidebar.classList.toggle('collapsed');
+                document.querySelector('.main-content')?.classList.toggle('sidebar-collapsed');
+            }
         });
+    }
+
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeMobileSidebar);
     }
 
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const page = item.getAttribute('data-page');
-            if (page) switchPage(page);
+            if (page) {
+                closeMobileSidebar();
+                switchPage(page);
+            }
         });
     });
 
@@ -2026,30 +2051,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const isAutoPrint = document.getElementById('pos-auto-print')?.checked;
                     const saleId = result.saleId;
                     const changeAmt = paymentMethod === 'credit' ? 0 : Math.max(0, paid - currentTotal);
-                    const changeStr = changeAmt > 0 ? ` · <span style="color:#10b981; font-weight:700;">Tiền thừa: ${changeAmt.toLocaleString()}đ</span>` : '';
+                    const changeStrText = changeAmt > 0 ? ` (Tiền thừa: ${changeAmt.toLocaleString()}đ)` : '';
 
-                    if (isAutoPrint && paymentMethod !== 'credit') {
+                    if (isAutoPrint) {
                         window.printInvoice(saleId);
-                    } else {
-                        // Modal thông báo thành công (giao diện tối giản, không icon/emoji rườm rà)
-                        showModal('Thanh toán thành công', `
-                            <div style="text-align: center; padding: 8px 4px;">
-                                <h3 style="font-size: 18px; font-weight: 700; color: #15803d; margin-bottom: 8px;">Đã hoàn tất đơn hàng!</h3>
-                                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">
-                                    Mã biên lai: <strong style="color: var(--primary-color);">#BL-${saleId ? saleId.slice(-6).toUpperCase() : ''}</strong><br>
-                                    Khách phải trả: <strong>${currentTotal.toLocaleString()}đ</strong>${changeStr}
-                                </p>
-                                <div style="display: flex; gap: 12px; justify-content: center;">
-                                    <button type="button" class="btn btn-outline-primary" style="flex: 1; padding: 12px; border-radius: 6px; font-weight: 700;" onclick="const m=document.getElementById('app-modal'); if(m) m.style.display='none'; window.printInvoice('${saleId}');">
-                                        In biên lai
-                                    </button>
-                                    <button type="button" class="btn btn-primary" style="flex: 1; padding: 12px; border-radius: 6px; font-weight: 700;" onclick="const m=document.getElementById('app-modal'); if(m) m.style.display='none';">
-                                        Bỏ qua (Không in)
-                                    </button>
-                                </div>
-                            </div>
-                        `, async () => true);
                     }
+                    
+                    // Thông báo Thành công trực tiếp, KHÔNG mở popup rườm rà
+                    alert(`Thanh toán thành công! Mã đơn: #BL-${saleId ? saleId.slice(-6).toUpperCase() : ''}${changeStrText}`);
                     
                     // Switch to remaining order tab or reset
                     orders = orders.filter(o => o.id !== activeOrderId);
