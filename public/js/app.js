@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (toggleSidebar) {
         toggleSidebar.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (window.innerWidth <= 992) {
+            if (window.innerWidth <= 1024) {
                 sidebar.classList.toggle('mobile-open');
                 sidebarOverlay.classList.toggle('active');
             } else {
@@ -299,7 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
             switchPage('dashboard');
             return;
         }
-        if (currentPage === page && page !== 'dashboard') return;
 
         // Update Nav UI
         navItems.forEach(item => {
@@ -314,14 +313,33 @@ document.addEventListener('DOMContentLoaded', () => {
         currentPage = page;
         // Persist current page to sessionStorage so reload restores it
         sessionStorage.setItem('currentPage', page);
-        renderLoading();
 
-        // Load page content
-        const html = await getPageHTML(page);
-        pageContent.innerHTML = html;
+        try {
+            renderLoading();
+            const html = await getPageHTML(page);
+            pageContent.innerHTML = html;
 
-        // Initialize page specific JS
-        await initPage(page);
+            // Initialize page specific JS
+            await initPage(page);
+
+            if (window.lucide) {
+                try {
+                    lucide.createIcons();
+                    document.querySelectorAll('svg[data-lucide]').forEach(el => el.removeAttribute('data-lucide'));
+                } catch (e) {
+                    console.warn('Lucide icon render warning:', e);
+                }
+            }
+        } catch (err) {
+            console.error('Lỗi tải trang:', page, err);
+            pageContent.innerHTML = `
+                <div style="padding: 32px; background: white; border-radius: 12px; border: 1px solid #fee2e2; margin: 20px; max-width: 600px;">
+                    <h3 style="color: #dc2626; margin-bottom: 8px;">⚠️ Không thể tải trang</h3>
+                    <p style="color: #4b5563; font-size: 14px; margin-bottom: 16px;">Xảy ra lỗi khi mở trang "${page}": ${err.message || err}</p>
+                    <button class="btn btn-primary" onclick="window.location.reload()">Thử tải lại trang</button>
+                </div>
+            `;
+        }
     }
 
     async function getPageHTML(page) {
@@ -867,36 +885,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             case 'settings':
                 return `
-                    <div class="page-header">
-                        <h2>Cài đặt hệ thống</h2>
+                    <div class="page-header" style="margin-bottom: 24px;">
+                        <div class="page-title-wrapper">
+                            <h2>Cài đặt & Quản lý dữ liệu</h2>
+                            <p class="page-subtitle">Sao lưu, khôi phục và quản lý dữ liệu phục vụ vận hành thực tế.</p>
+                        </div>
                     </div>
-                    <div class="row mt-3" style="display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 24px;">
-                        <div class="card" style="flex: 1; min-width: 300px; padding: 24px; border-left: 4px solid #2563eb;">
-                            <h3 style="color: #2563eb; margin-bottom: 12px; display:flex; align-items:center; gap:8px;"><i data-lucide="download"></i> Sao lưu Dữ liệu (Backup JSON)</h3>
-                            <p style="font-size: 14px; color: #64748b; margin-bottom: 20px;">Tải về file sao lưu định dạng JSON lưu trữ an toàn toàn bộ Sản phẩm, Đơn hàng, Khách hàng & Công nợ.</p>
-                            <a class="btn" style="background: #2563eb; color: white; display:inline-flex; align-items:center; gap:8px; text-decoration:none;" href="/api/system/backup" download>
-                                <i data-lucide="file-json"></i> Tải bản Sao lưu ngay
+
+                    <!-- Row 1: Sao lưu & Phục hồi dữ liệu -->
+                    <div class="row" style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 24px;">
+                        <div class="card" style="flex: 1; min-width: 300px; padding: 24px; border-left: 4px solid #2563eb; background: white; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                            <h3 style="color: #2563eb; font-size: 17px; font-weight: 700; margin-bottom: 12px;">Sao lưu Dữ liệu (Backup JSON)</h3>
+                            <p style="font-size: 14px; color: #64748b; margin-bottom: 20px; line-height: 1.5;">Tải về file sao lưu định dạng .json lưu trữ an toàn toàn bộ Sản phẩm, Đơn hàng, Khách hàng & Công nợ.</p>
+                            <a class="btn" style="background: #2563eb; color: white; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block;" href="/api/system/backup" download>
+                                Tải bản Sao lưu ngay
                             </a>
                         </div>
-                        <div class="card" style="flex: 1; min-width: 300px; padding: 24px; border-left: 4px solid #059669;">
-                            <h3 style="color: #059669; margin-bottom: 12px; display:flex; align-items:center; gap:8px;"><i data-lucide="upload"></i> Phục hồi Dữ liệu (Restore)</h3>
-                            <p style="font-size: 14px; color: #64748b; margin-bottom: 16px;">Chọn file `.json` đã sao lưu trước đó để khôi phục lại dữ liệu hệ thống.</p>
-                            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                                <input type="file" id="restore-file-input" accept=".json" class="form-control" style="font-size:13px; height:40px; padding:6px 12px; flex:1; min-width:180px;">
-                                <button class="btn" style="background: #059669; color: white; white-space:nowrap; height:40px;" onclick="handleRestoreBackup()">Khôi phục ngay</button>
+
+                        <div class="card" style="flex: 1; min-width: 300px; padding: 24px; border-left: 4px solid #059669; background: white; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                            <h3 style="color: #059669; font-size: 17px; font-weight: 700; margin-bottom: 12px;">Phục hồi Dữ liệu (Restore)</h3>
+                            <p style="font-size: 14px; color: #64748b; margin-bottom: 16px; line-height: 1.5;">Chọn file .json đã sao lưu trước đó để khôi phục lại dữ liệu hệ thống.</p>
+                            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                <input type="file" id="restore-file-input" accept=".json" class="form-control" style="font-size: 13px; height: 40px; padding: 6px 12px; flex: 1; min-width: 180px;">
+                                <button class="btn" style="background: #059669; color: white; white-space: nowrap; height: 40px; padding: 0 16px; border-radius: 6px; font-weight: 600; border: none; cursor: pointer;" onclick="window.handleRestoreBackup()">Khôi phục ngay</button>
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-3" style="display: flex; gap: 24px; flex-wrap: wrap;">
-                        <div class="card" style="flex: 1; min-width: 300px; padding: 24px;">
-                            <h3 style="color: #ea580c; margin-bottom: 12px;"><i data-lucide="refresh-cw"></i> Xóa dữ liệu thử nghiệm</h3>
-                            <p style="font-size: 14px; color: #64748b; margin-bottom: 20px;">Xóa toàn bộ lịch sử giao dịch (Đơn hàng, Phiếu nhập, v.v.). Giữ lại danh sách Sản phẩm, Danh mục, Khách hàng, NCC.</p>
-                            <button class="btn" style="background: #ea580c; color: white;" onclick="resetSystemData('transactions')">Xóa lịch sử giao dịch</button>
+
+                    <!-- Row 2: Xóa dữ liệu thử nghiệm & Reset hệ thống -->
+                    <div class="row" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div class="card" style="flex: 1; min-width: 300px; padding: 24px; border-left: 4px solid #ea580c; background: white; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                            <h3 style="color: #ea580c; font-size: 17px; font-weight: 700; margin-bottom: 12px;">Xóa dữ liệu thử nghiệm (Bán thực tế)</h3>
+                            <p style="font-size: 14px; color: #64748b; margin-bottom: 20px; line-height: 1.5;">Xóa toàn bộ lịch sử hóa đơn test, phiếu nhập test. Giữ lại danh sách Sản phẩm, Danh mục, Khách hàng, NCC để bán hàng thực tế.</p>
+                            <button class="btn" style="background: #ea580c; color: white; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 14px; border: none; cursor: pointer;" onclick="window.resetSystemData('transactions')">Xóa dữ liệu thử nghiệm</button>
                         </div>
-                        <div class="card" style="flex: 1; min-width: 300px; padding: 24px;">
-                            <h3 style="color: #dc2626; margin-bottom: 12px;"><i data-lucide="trash-2"></i> Reset toàn bộ hệ thống</h3>
-                            <p style="font-size: 14px; color: #64748b; margin-bottom: 20px;">Xóa <b>TẤT CẢ</b> dữ liệu bao gồm sản phẩm, khách hàng, giao dịch. Hệ thống sẽ trở về trạng thái trống ban đầu.</p>
-                            <button class="btn btn-danger" onclick="resetSystemData('full')">Xóa toàn bộ dữ liệu</button>
+
+                        <div class="card" style="flex: 1; min-width: 300px; padding: 24px; border-left: 4px solid #dc2626; background: white; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                            <h3 style="color: #dc2626; font-size: 17px; font-weight: 700; margin-bottom: 12px;">Reset toàn bộ hệ thống</h3>
+                            <p style="font-size: 14px; color: #64748b; margin-bottom: 20px; line-height: 1.5;">Xóa TẤT CẢ dữ liệu bao gồm sản phẩm, khách hàng, giao dịch. Hệ thống sẽ trở về trạng thái trống ban đầu.</p>
+                            <button class="btn btn-danger" style="background: #dc2626; color: white; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 14px; border: none; cursor: pointer;" onclick="window.resetSystemData('full')">Xóa toàn bộ dữ liệu</button>
                         </div>
                     </div>
                 `;
@@ -991,7 +1018,13 @@ document.addEventListener('DOMContentLoaded', () => {
             setupStockTake();
         } else if (page === 'inventory-audit') {
             await loadInventoryAudit();
+        } else if (page === 'settings') {
+            setupSettingsActions();
         }
+    }
+
+    function setupSettingsActions() {
+        // Settings page ready (Backup, Restore, and Reset controls initialized)
     }
 
     // Modal System
@@ -1343,7 +1376,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <form id="product-form">
                     <div class="form-row">
                         <div class="mb-3"><label>Tên sản phẩm</label><input type="text" name="name" class="form-control" required placeholder="Nhập tên sản phẩm..."></div>
-                        <div class="mb-3"><label>Mã SKU</label><input type="text" name="sku" class="form-control" required placeholder="Gõ mã hoặc dùng máy quét..."></div>
+                        <div class="mb-3"><label>Mã SKU <small style="font-weight:400; color:#94a3b8;">— để trống tự sinh</small></label><input type="text" name="sku" class="form-control" placeholder="Để trống tự sinh (hoặc gõ/quét mã)..."></div>
                     </div>
 
                     <div class="mb-3">
@@ -1358,13 +1391,30 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ${categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="mb-3"><label>Đơn vị tính</label><input type="text" name="unit" class="form-control" value="Cái"></div>
+                         <div class="mb-3">
+                            <label>Đơn vị tính</label>
+                            <select name="unit" class="form-control" id="prod-unit-select"
+                                onchange="if(this.value==='__other__'){document.getElementById('prod-unit-custom').style.display='block';document.getElementById('prod-unit-custom').focus();}else{document.getElementById('prod-unit-custom').style.display='none';}">
+                                <option value="Cái">Cái</option>
+                                <option value="Hộp">Hộp</option>
+                                <option value="Lon">Lon</option>
+                                <option value="Chai">Chai</option>
+                                <option value="Gói">Gói</option>
+                                <option value="Túi">Túi</option>
+                                <option value="Thùng">Thùng</option>
+                                <option value="Bịch">Bịch</option>
+                                <option value="Kg">Kg</option>
+                                <option value="Lít">Lít</option>
+                                <option value="Gram">Gram</option>
+                                <option value="__other__">— Tùy chỉnh (gõ tay)...</option>
+                            </select>
+                            <input type="text" id="prod-unit-custom" class="form-control" placeholder="Nhập đơn vị tính..." style="display:none; margin-top:6px;">
+                        </div>
                     </div>
 
                     <div class="form-row">
-                        <div class="mb-3"><label>Giá nhập (Ước tính)</label><input type="number" name="cost_price" class="form-control" value="0"></div>
+                        <div class="mb-3"><label>Giá nhập (đ) <small style="font-weight:400; color:#94a3b8;">— tự cập nhật khi nhập hàng</small></label><input type="number" name="cost_price" class="form-control" value="0"></div>
                         <div class="mb-3"><label>Giá bán (Niêm yết)</label><input type="number" name="selling_price" class="form-control" required placeholder="0"></div>
-                        <div class="mb-3"><label>Tồn kho ban đầu</label><input type="number" name="stock_quantity" class="form-control" value="0"></div>
                     </div>
 
                     <div class="form-row">
@@ -1399,11 +1449,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     // Update data payload
+                    if (!data.sku || !data.sku.trim()) {
+                        delete data.sku;
+                    }
+                    const unitCustomEl = form.querySelector('#prod-unit-custom');
+                    const unitSelectEl = form.querySelector('#prod-unit-select');
+                    if (unitCustomEl && unitCustomEl.style.display !== 'none' && unitCustomEl.value.trim()) {
+                        data.unit = unitCustomEl.value.trim();
+                    } else if (unitSelectEl) {
+                        data.unit = unitSelectEl.value === '__other__' ? 'Cái' : unitSelectEl.value;
+                    }
                     data.images = uploadedImages;
 
                     const res = await fetch('/api/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-                    if (res.ok) { alert('Thành công!'); loadProducts(); return true; }
-                    else { alert('Lỗi khi lưu sản phẩm'); return false; }
+                    const resData = await res.json().catch(() => ({}));
+                    if (res.ok) { 
+                        alert('Thành công!'); 
+                        loadProducts(); 
+                        return true; 
+                    } else { 
+                        alert(resData.error || resData.message || 'Lỗi khi lưu sản phẩm'); 
+                        return false; 
+                    }
                 } catch(e) { console.error(e); alert('Lỗi hệ thống'); return false; }
             }, 'modal-lg');
         };
@@ -1722,88 +1789,117 @@ document.addEventListener('DOMContentLoaded', () => {
                 const suggestImg = suggestion?.image || '';
 
                 const modalHTML = `
-                    <div style="display:flex; gap:16px; margin-bottom:12px; padding:12px; background:#f0fdf4; border:1px solid #86efac; border-radius:8px; align-items:center;">
-                        ${suggestImg ? `<img src="${suggestImg}" style="width:56px;height:56px;object-fit:contain;border-radius:6px;border:1px solid #e2e8f0;">` : '<div style="width:56px;height:56px;background:#e2e8f0;border-radius:6px;display:flex;align-items:center;justify-content:center;"><i data-lucide="package" style="width:24px;color:#94a3b8"></i></div>'}
+                    <div style="display:flex; gap:16px; margin-bottom:20px; padding:14px 18px; background:#f0fdf4; border:1px solid #86efac; border-radius:10px; align-items:center;">
+                        ${suggestImg ? `<img src="${suggestImg}" style="width:48px;height:48px;object-fit:contain;border-radius:8px;border:1px solid #e2e8f0;">` : '<div style="width:44px;height:44px;background:#dcfce7;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="package" style="width:22px;color:#16a34a"></i></div>'}
                         <div>
-                            <div style="font-size:13px;font-weight:600;color:#166534;">🔍 Đã quét mã: <code style="background:#dcfce7;padding:2px 8px;border-radius:4px;">${barcode}</code></div>
-                            <div style="font-size:12px;color:#15803d;margin-top:2px;">${suggestion && suggestion.name ? 'Tìm thấy gợi ý từ Open Food Facts' : 'Mã chưa có trong hệ thống – hãy điền thông tin bên dưới'}</div>
+                            <div style="font-size:14px;font-weight:700;color:#166534;">🔍 Đã quét mã: <code style="background:#dcfce7;padding:3px 10px;border-radius:6px;font-weight:800;font-size:13px;">${barcode}</code></div>
+                            <div style="font-size:12px;color:#15803d;margin-top:3px;">${suggestion && suggestion.name ? 'Tìm thấy gợi ý sản phẩm từ Open Food Facts' : 'Mã chưa có trong hệ thống – điền thông tin bên dưới để bán'}</div>
                         </div>
                     </div>
                     <form id="quick-create-form">
                         <input type="hidden" name="barcode" value="${barcode}">
-                        <div class="form-row">
-                            <div class="mb-3">
-                                <label>Tên sản phẩm <span style="color:#dc2626">*</span></label>
-                                <input type="text" name="name" id="quick-name" class="form-control" required value="${suggestName}" placeholder="Nhập tên sản phẩm...">
+                        
+                        <div class="form-row" style="display:flex; gap:16px; margin-bottom:16px;">
+                            <div style="flex:2;">
+                                <label style="font-weight:600; font-size:13px; margin-bottom:6px; display:block;">Tên sản phẩm <span style="color:#dc2626">*</span></label>
+                                <input type="text" name="name" id="quick-name" class="form-control" required value="${suggestName}" placeholder="Nhập tên sản phẩm..." style="height:46px; border-radius:8px; font-weight:600; font-size:14px; box-sizing:border-box;">
+                            </div>
+                            <div style="flex:1;">
+                                <label style="font-weight:600; font-size:13px; margin-bottom:6px; display:block;">Danh mục</label>
+                                <select name="category_id" class="form-control" style="height:46px; border-radius:8px; font-size:14px; box-sizing:border-box;">
+                                    <option value="">Khác / Bách hóa</option>
+                                    ${catOptions}
+                                </select>
                             </div>
                         </div>
-                        <div class="form-row">
-                            <div class="mb-3">
-                                <label>Mã vạch (Barcode)</label>
-                                <input type="text" class="form-control" readonly value="${barcode}" style="background:#f8fafc; font-weight:600; color:#15803d; border-color:#bbf7d0;">
+
+                        <div class="form-row" style="display:flex; gap:16px; margin-bottom:16px;">
+                            <div style="flex:2;">
+                                <label style="font-weight:600; font-size:13px; margin-bottom:6px; display:block;">Giá bán (đ) <span style="color:#dc2626">*</span></label>
+                                <input type="text" name="selling_price" id="quick-selling-price" class="form-control" required
+                                    placeholder="0"
+                                    style="height:46px; border-radius:8px; font-weight:800; font-size:16px; color:var(--primary-color); text-align:right; box-sizing:border-box;"
+                                    onfocus="this.select()"
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/\\B(?=(\\d{3})+(?!\\d))/g,',')">
                             </div>
-                            <div class="mb-3">
-                                <label>Mã SKU</label>
-                                <input type="text" name="sku" class="form-control" placeholder="Để trống tự sinh">
+                            <div style="flex:1;">
+                                <label style="font-weight:600; font-size:13px; margin-bottom:6px; display:block;">Đơn vị tính</label>
+                                <select name="unit" class="form-control" id="quick-unit-select" style="height:46px; border-radius:8px; font-size:14px; box-sizing:border-box;"
+                                    onchange="if(this.value==='__other__'){document.getElementById('quick-unit-custom').style.display='block';document.getElementById('quick-unit-custom').focus();}">
+                                    <option value="Cái">Cái</option>
+                                    <option value="Hộp">Hộp</option>
+                                    <option value="Lon">Lon</option>
+                                    <option value="Chai">Chai</option>
+                                    <option value="Gói">Gói</option>
+                                    <option value="Túi">Túi</option>
+                                    <option value="Thùng">Thùng</option>
+                                    <option value="Bịch">Bịch</option>
+                                    <option value="Kg">Kg</option>
+                                    <option value="Lít">Lít</option>
+                                    <option value="Gram">Gram</option>
+                                    <option value="__other__">— Tùy chỉnh (gõ tay)...</option>
+                                </select>
+                                <input type="text" name="unit" id="quick-unit-custom" class="form-control"
+                                    placeholder="Nhập ĐVT..."
+                                    style="display:none; margin-top:6px; height:46px; border-radius:8px; box-sizing:border-box;">
+                            </div>
+                            <div style="flex:1;">
+                                <label style="font-weight:600; font-size:13px; color:#64748b; margin-bottom:6px; display:block;">Mã SKU</label>
+                                <input type="text" name="sku" class="form-control" placeholder="Tự sinh nếu trống" style="height:46px; border-radius:8px; font-size:14px; box-sizing:border-box;">
                             </div>
                         </div>
-                        <div class="form-row">
-                            <div class="mb-3">
-                                <label>Giá nhập (đ) <span style="color:#dc2626">*</span></label>
-                                <input type="number" name="cost_price" class="form-control" required placeholder="0" min="0">
-                            </div>
-                            <div class="mb-3">
-                                <label>Giá bán (đ) <span style="color:#dc2626">*</span></label>
-                                <input type="number" name="selling_price" class="form-control" required placeholder="0" min="0" style="font-weight:700;color:var(--primary-color)">
-                            </div>
+
+                        <div style="margin-top:12px;">
+                            <button type="submit" class="btn btn-primary btn-block" style="height:48px; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px; border-radius:8px; width:100%; border:none;">
+                                <i data-lucide="shopping-cart" style="width:18px;height:18px;"></i>
+                                <span>LƯU SẢN PHẨM & THÊM VÀO GIỎ HÀNG</span>
+                            </button>
                         </div>
-                        <div class="form-row">
-                            <div class="mb-3">
-                                <label>Số lượng tồn kho ban đầu</label>
-                                <input type="number" name="stock_quantity" class="form-control" value="0" min="0">
-                            </div>
-                            <div class="mb-3">
-                                <label>Đơn vị tính</label>
-                                <input type="text" name="unit" class="form-control" value="Cái" placeholder="Cái, Hộp, Chai, Kg...">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label>Danh mục</label>
-                            <select name="category_id" class="form-control">
-                                <option value="">Khác</option>
-                                ${catOptions}
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">
-                            <i data-lucide="save" style="width:16px;height:16px;"></i> LƯU & THÊM VÀO GIỎ HÀNG
-                        </button>
                     </form>`;
 
                 showModal('Thêm nhanh sản phẩm mới', modalHTML, async (data) => {
                     try {
-                        if (!data.name || !data.selling_price) { alert('Vui lòng điền tên và giá bán!'); return false; }
+                        // Parse giá bán: bỏ dấu phẩy ngăn cách ngàn (ví dụ: "5,000" -> 5000)
+                        const sellingPrice = parseInt((data.selling_price || '0').replace(/,/g, '')) || 0;
+                        if (!data.name || sellingPrice <= 0) { alert('Vui lòng điền tên và giá bán!'); return false; }
                         if (!data.sku) delete data.sku;
+                        // Xử lý unit: nếu có hai trường name="unit", lấy giá trị từ custom nếu có
+                        const unitCustomEl = document.getElementById('quick-unit-custom');
+                        const unitSelectEl = document.getElementById('quick-unit-select');
+                        let unit = 'Cái';
+                        if (unitCustomEl && unitCustomEl.style.display !== 'none') {
+                            unit = unitCustomEl.value.trim() || 'Cái';
+                        } else if (unitSelectEl) {
+                            unit = unitSelectEl.value === '__other__' ? 'Cái' : unitSelectEl.value;
+                        }
+                        // Sản phẩm mới tạo tại POS: giá nhập = 0, tồn kho = 0
+                        // Tồn kho sẽ được nhập đúng qua Phiếu Nhập Hàng
+                        const payload = {
+                            name: data.name,
+                            sku: data.sku,
+                            barcode: data.barcode,
+                            category_id: data.category_id || undefined,
+                            unit: unit,
+                            selling_price: sellingPrice,
+                            cost_price: 0,
+                            stock_quantity: 0
+                        };
+                        if (!payload.sku) delete payload.sku;
+                        if (!payload.category_id) delete payload.category_id;
                         const res = await fetch('/api/products', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(data)
+                            body: JSON.stringify(payload)
                         });
                         if (!res.ok) { alert('Lỗi lưu sản phẩm'); return false; }
                         const saved = await res.json();
-                        const qty = parseInt(data.stock_quantity) || 0;
-                        if (qty > 0) {
-                            await fetch('/api/inventory', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ product_id: saved.id, type: 'in', quantity: qty, note: 'Tồn kho ban đầu (quét mã vạch)' })
-                            }).catch(() => {});
-                        }
-                        addToCart({ ...data, id: saved.id, selling_price: Number(data.selling_price), stock_quantity: qty });
-                        flashBarcodeHint('success', data.name);
+                        // Thêm vào giỏ hàng: hàng đang trên tay khách, bán luôn
+                        addToCart({ ...payload, id: saved.id, selling_price: sellingPrice, stock_quantity: 0 });
+                        flashBarcodeHint('success', payload.name);
                         setTimeout(() => { searchInput.focus(); }, 100);
                         return true;
                     } catch (e) { console.error(e); alert('Lỗi hệ thống'); return false; }
-                });
+                }, 'modal-lg');
 
                 setTimeout(() => {
                     const nameEl = document.getElementById('quick-name');
@@ -1812,6 +1908,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 150);
             }).catch(err => { console.error(err); });
         }
+
 
 
         function showSearchDropdown(products) {
@@ -1965,7 +2062,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 emptyMsg.style.display = 'none'; if (cartTable) cartTable.style.display = 'table';
                 cartItems.innerHTML = cart.map((item, index) => `
-                    <tr><td><div style="font-weight: 600;">${item.name}</div><div style="font-size: 12px; color: var(--text-muted);">${item.sku}</div></td><td>${item.unit || 'Cái'}</td><td>${item.selling_price.toLocaleString()}đ</td><td align="center"><input type="number" value="${item.quantity}" min="1" class="qty-input form-control" style="width: 80px; text-align: center; padding: 6px; margin: 0; display: inline-block;" data-index="${index}"></td><td style="font-weight: 700;">${(item.selling_price * item.quantity).toLocaleString()}đ</td><td><button class="btn-icon text-danger btn-remove" data-index="${index}"><i data-lucide="trash-2"></i></button></td></tr>
+                    <tr><td><div style="font-weight: 600;">${item.name}</div><div style="font-size: 12px; color: var(--text-muted);">${item.sku || ''}</div></td><td>${item.unit || 'Cái'}</td><td>${item.selling_price.toLocaleString()}đ</td><td align="center"><input type="number" value="${item.quantity}" min="1" class="qty-input form-control" style="width: 80px; text-align: center; padding: 6px; margin: 0; display: inline-block;" data-index="${index}"></td><td style="font-weight: 700;">${(item.selling_price * item.quantity).toLocaleString()}đ</td><td><button class="btn-icon text-danger btn-remove" data-index="${index}"><i data-lucide="trash-2"></i></button></td></tr>
                 `).join('');
                 if (window.lucide) {
                     lucide.createIcons();
@@ -2460,7 +2557,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             function renderPoItems() {
                 itemsTable.innerHTML = poItems.length === 0 
-                  ? '<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted); opacity: 0.5;">Chưa có sản phẩm nào được chọn</td></tr>'
+                  ? '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted); opacity: 0.5;">Chưa có sản phẩm nào được chọn</td></tr>'
                   : poItems.map((item, idx) => `
                     <tr>
                         <td style="font-weight: 600; text-align: left; padding: 10px 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.name}</td>
@@ -2470,7 +2567,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <input type="number" class="po-input po-pack" data-idx="${idx}" value="${item.pack_qty || 1}" style="width: 100%; max-width: 55px; text-align: center; padding: 6px 4px; box-sizing: border-box;" title="Ví dụ: 1 thùng có 24 lon thì nhập 24" placeholder="1" onfocus="this.select()">
                             ${(item.pack_qty && item.pack_qty > 1) 
                                 ? `<div style="font-size: 10px; color: #166534; font-weight: 700; margin-top: 3px; background: #dcfce7; padding: 2px 4px; border-radius: 4px; display: inline-block;">= ${item.quantity * item.pack_qty} cái</div>` 
-                                : `<div style="font-size: 10px; color: #94a3b8; margin-top: 3px;">(Nhập lẻ)</div>`}
+                                : ''}
                         </td>
                         <td style="text-align: right; padding: 10px 12px;">
                             <div style="display: flex; align-items: center; justify-content: flex-end; gap: 3px;">
@@ -2646,6 +2743,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.renderPagination(data.length, limit, page, pageContainer, (newPage) => {
                         window.adminPage[key] = newPage;
                         render();
+                        if (wrapper) {
+                            wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
                     });
                 }
             }
@@ -3829,7 +3929,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div style='display:flex;align-items:center;gap:10px;'>
                             <div style='background:#f97316;border-radius:10px;padding:8px;display:flex;'><i data-lucide='alert-triangle' style='width:20px;height:20px;color:white;'></i></div>
                             <div>
-                                <div style='font-weight:800;font-size:16px;color:#9a3412;'>⚠️ ${lowStock.length} sản phẩm sắp hết hàng!</div>
+                                <div style='font-weight:800;font-size:16px;color:#9a3412;'>${lowStock.length} sản phẩm sắp hết hàng!</div>
                                 <div style='font-size:12px;color:#c2410c;'>Cần nhập thêm hàng sớm để phục vụ bán lẻ</div>
                             </div>
                         </div>

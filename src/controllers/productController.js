@@ -41,7 +41,14 @@ exports.createProduct = async (req, res) => {
         const id = await Product.create(req.body);
         res.status(201).json({ id, ...req.body });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('createProduct error:', error);
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern || {})[0];
+            const val = error.keyValue ? error.keyValue[field] : '';
+            const fieldName = field === 'barcode' ? 'Mã vạch' : (field === 'sku' ? 'Mã SKU' : field);
+            return res.status(400).json({ error: `${fieldName} "${val}" đã tồn tại trong hệ thống!` });
+        }
+        res.status(500).json({ error: error.message || 'Lỗi khi lưu sản phẩm' });
     }
 };
 
@@ -50,6 +57,13 @@ exports.updateProduct = async (req, res) => {
         await Product.update(req.params.id, req.body);
         res.json({ message: 'Product updated successfully' });
     } catch (error) {
+        console.error('updateProduct error:', error);
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern || {})[0];
+            const val = error.keyValue ? error.keyValue[field] : '';
+            const fieldName = field === 'barcode' ? 'Mã vạch' : (field === 'sku' ? 'Mã SKU' : field);
+            return res.status(400).json({ error: `${fieldName} "${val}" đã tồn tại trong hệ thống!` });
+        }
         res.status(500).json({ error: error.message });
     }
 };

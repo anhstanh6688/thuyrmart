@@ -79,7 +79,9 @@ class Sale {
                 const product = await ProductModel.findById(item.id).session(session);
                 if (!product) throw new Error(`Sản phẩm không tồn tại`);
                 if (product.stock_quantity < item.quantity) {
-                    throw new Error(`Sản phẩm "${product.name}" không đủ tồn kho (chỉ còn ${product.stock_quantity})`);
+                    // Cho phép bán khi tồn kho không đủ (hàng đang trên tay khách)
+                    // Tồn kho sẽ âm → cập nhật lại qua Phiếu Nhập Hàng hoặc Kiểm kê
+                    console.warn(`Cảnh báo: SP "${product.name}" tồn kho (${product.stock_quantity}) < số lượng bán (${item.quantity}). Tồn kho sẽ âm.`);
                 }
 
                 // Update product stock
@@ -235,7 +237,7 @@ class Sale {
                     const product = await ProductModel.findById(item.product_id).session(session);
                     if (!product) throw new Error('Sản phẩm trong đơn hàng không tồn tại');
                     if (product.stock_quantity < item.quantity) {
-                        throw new Error(`Sản phẩm "${product.name}" không đủ tồn kho để gia hạn thanh toán (chỉ còn ${product.stock_quantity})`);
+                        console.warn(`Cảnh báo: SP "${product.name}" tồn kho (${product.stock_quantity}) < số lượng bán (${item.quantity}) khi khôi phục đơn hàng.`);
                     }
                     
                     product.stock_quantity -= item.quantity;
